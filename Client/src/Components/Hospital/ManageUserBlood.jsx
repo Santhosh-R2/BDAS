@@ -19,7 +19,7 @@ import {
 } from '@mui/material';
 import HosNav from './HosNav';
 import HosSidemenu from './HosSidemenu';
-import axios from 'axios';
+import axios from 'axios'; 
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axiosInstance from '../Service/BaseUrl';
@@ -105,7 +105,7 @@ function ManageUserBlood() {
                     request.USERID !== null &&
                     request.USERID !== undefined &&
                     request.IsHospital === "Pending" &&
-                    request.IsDoner !== "Accepted"
+                    request.IsDoner !== "Fulfilled" 
                 );
                 setRequests(userRequests);
 
@@ -113,7 +113,7 @@ function ManageUserBlood() {
                     request.USERID !== null &&
                     request.USERID !== undefined &&
                     request.IsHospital === "Rejected" &&
-                    request.IsDoner !== "Accepted" &&
+                    request.IsDoner !== "Fulfilled" && 
                     request.RejectedBy.some(rejection =>
                         rejection.hospitalId && 
                         rejection.hospitalId._id && 
@@ -132,7 +132,7 @@ function ManageUserBlood() {
                     request.HospitalId !== undefined &&
                     request.HospitalId._id.toString() !== HOSPITAL_ID &&
                     request.IsHospital === "Pending" &&
-                    request.IsDoner !== "Accepted"
+                    request.IsDoner !== "Fulfilled" 
                 );
                 setOtherHospitalRequests(otherHospRequests);
 
@@ -265,7 +265,7 @@ function ManageUserBlood() {
     };
 
     const isActionAllowed = (status) => {
-        return status === 'Planned' || status === 'Very Urgent' || status === 'Emergency';
+        return status === 'Planned' || status === 'Very Urgent' || status === 'Emergency' || status === 'Rejected'; 
     };
 
     const handleTabChange = (event, newValue) => {
@@ -380,14 +380,21 @@ function ManageUserBlood() {
                                             </Box>
                                         </TableCell>
                                         <TableCell className="tableCell" style={{ display: "flex", justifyContent: "center" }}>
-                                            {isActionAllowed(request.Status) ? (
+                                            {request.IsHospital === "Approved" ? (
+                                                <Typography variant="body2" color="success">
+                                                    Approved by you
+                                                </Typography>
+                                            ) : (request.IsHospital === "Rejected" && request.RejectedBy.some(r => r.hospitalId && r.hospitalId._id && r.hospitalId._id.toString() === HOSPITAL_ID)) ? (
+                                                <Typography variant="body2" color="error">
+                                                    Rejected by you
+                                                </Typography>
+                                            ) : (isActionAllowed(request.Status) && request.IsDoner !== "Fulfilled") ? ( 
                                                 <Box sx={{ display: 'flex', gap: '10px' }}>
                                                     <Button
                                                         variant="contained"
                                                         color="success"
                                                         size="small"
                                                         onClick={() => handleApprove(request._id)}
-                                                        disabled={request.Status === 'Approved'}
                                                     >
                                                         Approve
                                                     </Button>
@@ -396,7 +403,6 @@ function ManageUserBlood() {
                                                         color="error"
                                                         size="small"
                                                         onClick={() => handleRejectClick(request._id)}
-                                                        disabled={request.Status === 'Rejected'}
                                                     >
                                                         Reject
                                                     </Button>
@@ -478,26 +484,38 @@ function ManageUserBlood() {
                                             {rejectionInfo?.reason || 'No reason provided'}
                                         </TableCell>
                                         <TableCell>
-                                            <Box sx={{ display: 'flex', gap: '10px' }}>
-                                                <Button
-                                                    variant="contained"
-                                                    color="success"
-                                                    size="small"
-                                                    onClick={() => handleApprove(request._id)}
-                                                    disabled={request.Status === 'Approved'}
-                                                >
-                                                    Approve
-                                                </Button>
-                                                <Button
-                                                    variant="contained"
-                                                    color="error"
-                                                    size="small"
-                                                    onClick={() => handleRejectClick(request._id)}
-                                                    disabled={request.Status === 'Rejected'}
-                                                >
-                                                    Reject
-                                                </Button>
-                                            </Box>
+                                            {request.IsHospital === "Approved" ? (
+                                                <Typography variant="body2" color="success">
+                                                    Approved by you
+                                                </Typography>
+                                            ) : (request.IsHospital === "Rejected" && request.RejectedBy.some(r => r.hospitalId && r.hospitalId._id && r.hospitalId._id.toString() === HOSPITAL_ID)) ? (
+                                                <Typography variant="body2" color="error">
+                                                    Rejected by you
+                                                </Typography>
+                                            ) : (isActionAllowed(request.Status) && request.IsDoner !== "Fulfilled") ? ( 
+                                                <Box sx={{ display: 'flex', gap: '10px' }}>
+                                                    <Button
+                                                        variant="contained"
+                                                        color="success"
+                                                        size="small"
+                                                        onClick={() => handleApprove(request._id)}
+                                                    >
+                                                        Approve
+                                                    </Button>
+                                                    <Button
+                                                        variant="contained"
+                                                        color="error"
+                                                        size="small"
+                                                        onClick={() => handleRejectClick(request._id)}
+                                                    >
+                                                        Reject
+                                                    </Button>
+                                                </Box>
+                                            ) : (
+                                                <Typography variant="body2" color="textSecondary">
+                                                    No actions available
+                                                </Typography>
+                                            )}
                                         </TableCell>
                                     </TableRow>
                                 );

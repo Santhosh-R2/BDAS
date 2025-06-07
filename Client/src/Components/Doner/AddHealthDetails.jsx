@@ -240,7 +240,7 @@ function AddHealthDetails() {
       if (response.data.message === "Profile updated successfully") {
         toast.success("Profile updated successfully");
         localStorage.setItem('Doner', JSON.stringify(response.data.donor));
-        setTimeout(() => navigate('/doner-Profile'), 2000);
+        setTimeout(() => navigate('/doner-dashboard'), 2000);
       } else {
         toast.error(response.data.message || 'Failed to update profile');
       }

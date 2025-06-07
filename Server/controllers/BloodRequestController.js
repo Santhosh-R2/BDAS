@@ -1,65 +1,73 @@
 const BloodRequest = require("../models/HospitalBloodReq");
 const Donor = require('../models/DonerModel');
+const { sendEmergencyRequestToDoners } = require('../Utility/emailService');
 
-exports.createBloodRequest = (req, res) => {
-  const {
-    PatientName,
-    ContactNumber,
-    BloodType,
-    UnitsRequired,
-    Status,
-    HospitalId,
-    USERID,
-    specialization,
-    doctorName,
-    Date,
-    Time,
-    address
-  } = req.body;
+exports.createBloodRequest = async (req, res) => {
+  try {
+    const {
+      PatientName,
+      ContactNumber,
+      BloodType,
+      UnitsRequired,
+      Status,
+      HospitalId,
+      USERID,
+      specialization,
+      doctorName,
+      Date,
+      Time,
+      address
+    } = req.body;
 
-  const newRequest = new BloodRequest({
-    PatientName,
-    ContactNumber,
-    BloodType,
-    UnitsRequired,
-    Status,
-    HospitalId,
-    USERID,
-    Date,
-    specialization,
-    doctorName,
-    Time,
-    address
-  });
-
-  newRequest.save()
-    .then(result => {
-      res.status(201).json({
-        data: result,
-        message: 'Blood request created successfully'
-      });
-    })
-    .catch(error => {
-      console.error('Create Blood Request error:', error);
-
-      if (error.status && error.message) {
-        return res.status(error.status).json({ message: error.message });
-      }
-
-      if (error.name === 'ValidationError') {
-        return res.status(400).json({
-          message: 'Validation failed',
-          errors: Object.values(error.errors).map(e => e.message)
-        });
-      }
-
-      res.status(500).json({
-        message: 'Something went wrong while creating blood request',
-        error: error.message
-      });
+    const newRequest = new BloodRequest({
+      PatientName,
+      ContactNumber,
+      BloodType,
+      UnitsRequired,
+      Status,
+      HospitalId,
+      USERID,
+      Date,
+      specialization,
+      doctorName,
+      Time,
+      address
     });
-};
 
+    const result = await newRequest.save();
+
+    // Check if status is Very Urgent or Emergency
+    if (Status === 'Very Urgent' || Status === 'Emergency') {
+      // Send emails in background (don't await)
+      sendEmergencyRequestToDoners(result)
+        .catch(err => console.error('Background email error:', err));
+    }
+
+    res.status(201).json({
+      data: result,
+      message: 'Blood request created successfully'
+    });
+
+  } catch (error) {
+    console.error('Create Blood Request error:', error);
+
+    if (error.status && error.message) {
+      return res.status(error.status).json({ message: error.message });
+    }
+
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({
+        message: 'Validation failed',
+        errors: Object.values(error.errors).map(e => e.message)
+      });
+    }
+
+    res.status(500).json({
+      message: 'Something went wrong while creating blood request',
+      error: error.message
+    });
+  }
+};
 exports.getAllBloodRequests = (req, res) => {
   BloodRequest.find()
     .populate({

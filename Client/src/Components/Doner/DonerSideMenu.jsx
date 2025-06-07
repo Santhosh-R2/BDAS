@@ -54,7 +54,7 @@ function DonerSideMenu() {
         { name: 'Manage Request', icon: icon10, path: '/doner-FullFilled' },
         { name: 'Donation History', icon: icon7, path: '/doner-completed-requests' },
         // { name: 'Notification', icon: icon4, path: '#' },
-        { name: 'About Us', icon: icon5, path: '/doner-aboutus' },
+        // { name: 'About Us', icon: icon5, path: '/doner-aboutus' },
         { name: 'Contact Us', icon: icon6, path: '/doner-ContactUs' },
         { name: 'Logout', icon: icon3, action: () => setOpenLogoutDialog(true) }
     ];

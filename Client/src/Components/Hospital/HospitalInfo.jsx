@@ -5,11 +5,14 @@ import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import InputAdornment from '@mui/material/InputAdornment';
+import Typography from '@mui/material/Typography';
 import '../../Styles/HospitalInfo.css';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import axiosInstance from '../Service/BaseUrl';
+
 function HospitalInfo() {
     const location = useLocation();
     const navigate = useNavigate();
@@ -23,6 +26,7 @@ function HospitalInfo() {
     });
 
     const [showPassword, setShowPassword] = useState(false);
+    const [documentFileName, setDocumentFileName] = useState('');
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -30,14 +34,16 @@ function HospitalInfo() {
     };
 
     const handleFileChange = (e) => {
-        setHospital(prev => ({ ...prev, document: e.target.files[0] }));
+        const file = e.target.files[0];
+        setHospital(prev => ({ ...prev, document: file }));
+        setDocumentFileName(file ? file.name : '');
     };
 
     const togglePasswordVisibility = () => {
         setShowPassword(prev => !prev);
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
         if (!timeRegex.test(hospital.OpeningTime) || !timeRegex.test(hospital.ClosingTime)) {
@@ -51,45 +57,64 @@ function HospitalInfo() {
         }
 
         const formDataToSend = new FormData();
-        formDataToSend.append('ProfilePhoto', hospital.ProfilePhoto);
-        formDataToSend.append('FullName', hospital.FullName);
-        formDataToSend.append('RegistrationNumber', hospital.RegistrationNumber);
-        formDataToSend.append('Email', hospital.Email);
-        formDataToSend.append('Password', hospital.Password);
-        formDataToSend.append('PhoneNo', hospital.PhoneNo);
-        formDataToSend.append('Address', hospital.Address);
-        formDataToSend.append('Street', hospital.Street);
-        formDataToSend.append('City', hospital.City);
-        formDataToSend.append('Pincode', hospital.Pincode);
-        formDataToSend.append('OpeningTime', hospital.OpeningTime);
-        formDataToSend.append('ClosingTime', hospital.ClosingTime);
-        formDataToSend.append('Document', hospital.document);
 
-        console.log('Submitting hospital data:', hospital);
+        Object.keys(hospital).forEach(key => {
+            if (hospital[key] !== null && hospital[key] !== undefined) {
+                if (key === 'document') {
+                    formDataToSend.append('Document', hospital.document);
+                } else if (key === 'ProfilePhoto') {
+                    if (hospital.ProfilePhoto instanceof File) {
+                        formDataToSend.append('ProfilePhoto', hospital.ProfilePhoto);
+                    } else {
+                        formDataToSend.append('ProfilePhoto', hospital.ProfilePhoto);
+                    }
+                } else {
+                    formDataToSend.append(key, hospital[key]);
+                }
+            }
+        });
 
-        axiosInstance.post('/hospital-registration', formDataToSend)
-        .then(response => {
+
+        console.log('Submitting hospital data (state values):', hospital);
+
+        try {
+            const response = await axiosInstance.post('/hospital-registration', formDataToSend);
             const { message } = response.data;
 
             if (response.status === 201 && message === "Registration successful") {
-                toast.success('Registration successfully');
-                setTimeout(() => navigate('/hosLogin'), 2000); 
+                toast.success('Registration successful!');
+                setTimeout(() => navigate('/hosLogin'), 2000);
             } else {
-                if (message === "Email already exists" || 
+                if (message === "Email already exists" ||
                     message === "Phone number already exists" ||
                     message === "Registration number already exists") {
                     toast.error(message);
-                    setTimeout(() => navigate('/register'), 2000); 
-
+                    setTimeout(() => navigate('/register'), 2000);
                 } else {
                     toast.error('Registration failed. Please try again.');
                 }
             }
-        })
-        .catch(error => {
-            console.error(error);
-            toast.error( 'Registration failed. Please try again.');
-        });    };
+        } catch (error) {
+            console.error("Registration error:", error);
+            if (error.response && error.response.data && error.response.data.message) {
+                toast.error(error.response.data.message);
+                if (error.response.data.message.includes("exists")) {
+                    setTimeout(() => navigate('/register'), 2000);
+                }
+            } else {
+                toast.error('An unexpected error occurred during registration. Please try again.');
+            }
+        }
+    };
+
+    // Helper function to truncate the file name
+    const getDisplayedFileName = (name) => {
+        const maxLength = 20;
+        if (name.length > maxLength) {
+            return name.substring(0, maxLength) + '...';
+        }
+        return name;
+    };
 
     return (
         <div className='main-hos-reg-container'>
@@ -111,7 +136,8 @@ function HospitalInfo() {
                 <div className='hospitalInfo-row'>
                     <TextField
                         name="OpeningTime"
-                        placeholder="Opening Time HH:MM"
+                        label="Opening Time"
+                        placeholder="HH:MM"
                         variant="outlined"
                         fullWidth
                         margin="normal"
@@ -119,11 +145,11 @@ function HospitalInfo() {
                         className="hospitalInfo-textField"
                         value={hospital.OpeningTime}
                         onChange={handleChange}
-                        InputLabelProps={{ shrink: false }}
                     />
                     <TextField
                         name="ClosingTime"
-                        placeholder="Closing Time HH:MM"
+                        label="Closing Time"
+                        placeholder="HH:MM"
                         variant="outlined"
                         fullWidth
                         margin="normal"
@@ -131,7 +157,6 @@ function HospitalInfo() {
                         className="hospitalInfo-textField"
                         value={hospital.ClosingTime}
                         onChange={handleChange}
-                        InputLabelProps={{ shrink: false }}
                     />
                 </div>
 
@@ -147,29 +172,38 @@ function HospitalInfo() {
                         required
                     />
                     <label htmlFor="document-upload" className='hospitalInfo-uploadLabel'>
-                        Upload 
+                        {documentFileName ? 'Change Document' : 'Upload Document'}
                     </label>
+                    {documentFileName && (
+                        <Typography variant="body2" className="hospitalInfo-fileInputDisplay">
+                            Selected file: <strong>{getDisplayedFileName(documentFileName)}</strong>
+                        </Typography>
+                    )}
                 </div>
 
                 <div className='hospitalInfo-pass'>
                     <TextField
-                        placeholder="Enter Password"
+                        label="Password (Read-Only)"
                         type={showPassword ? "text" : "password"}
                         variant="outlined"
-                        style={{ width: "300px" }}
                         size="small"
                         className="hospitalInfo-textField"
                         value={hospital.Password || ''}
                         InputProps={{
                             readOnly: true,
                             endAdornment: (
-                                <IconButton onClick={togglePasswordVisibility}>
-                                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                                </IconButton>
+                                <InputAdornment position="end">
+                                    <IconButton
+                                        aria-label="toggle password visibility"
+                                        onClick={togglePasswordVisibility}
+                                        edge="end"
+                                    >
+                                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                                    </IconButton>
+                                </InputAdornment>
                             )
                         }}
                     />
-                   
                 </div>
 
                 <div className='hospitalInfo-buttonContainer'>

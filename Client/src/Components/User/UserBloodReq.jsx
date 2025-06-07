@@ -119,13 +119,13 @@ function UserBloodReq() {
 
     const validateDate = (date) => {
         if (!date) return 'Date is required';
-        
+
         // Check if the date string matches YYYY-MM-DD format with 4-digit year
         const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
         if (!dateRegex.test(date)) {
             return 'Date must be in YYYY-MM-DD format';
         }
-        
+
         return '';
     };
 
@@ -187,7 +187,7 @@ function UserBloodReq() {
             case 'Date':
                 error = validateDate(value);
                 break;
-            case 'address':  
+            case 'address':
                 error = validateAddress(value);
                 break;
             default:
@@ -200,67 +200,73 @@ function UserBloodReq() {
         }));
     }
 
-    const handleSubmit = () => {
-        const newErrors = {
-            patientName: validatePatientName(formData.patientName),
-            doctorName: validateDoctorName(formData.doctorName),
-            contactNumber: validateContactNumber(formData.contactNumber),
-            unitsRequired: validateUnitsRequired(formData.unitsRequired),
-            address: validateAddress(formData.address),
-            Date: validateDate(formData.Date)
-        };
-
-        setErrors(newErrors);
-
-        const hasErrors = Object.values(newErrors).some(error => error !== '');
-        const isEmptyField = !formData.patientName || !formData.doctorName ||
-            !formData.contactNumber || !formData.specialization ||
-            !formData.bloodType || !formData.unitsRequired ||
-            !formData.status || !formData.Date || !formData.Time || !formData.address;
-
-        if (hasErrors || isEmptyField) {
-            toast.error('Please fill all required fields correctly.');
-            return;
-        }
-
-        const requestData = {
-            PatientName: formData.patientName,
-            doctorName: formData.doctorName,
-            specialization: formData.specialization,
-            ContactNumber: formData.contactNumber,
-            BloodType: formData.bloodType,
-            UnitsRequired: formData.unitsRequired,
-            Status: formData.status,
-            USERID: formData.USERID,
-            Date: formData.Date,
-            Time: formData.Time,
-            address: formData.address
-        };
-
-        axiosInstance.post('/AddBloodRequest', requestData)
-            .then(response => {
-                console.log(response.data);
-                toast.success('Blood request submitted successfully!');
-                setFormData({
-                    patientName: '',
-                    doctorName: '',
-                    contactNumber: '',
-                    specialization: '',
-                    bloodType: '',
-                    unitsRequired: '',
-                    status: '',
-                    USERID: USERID,
-                    Date: '',
-                    Time: '',
-                    address: ''
-                });
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                toast.error('Failed to submit blood request. Please try again.');
-            });
+const handleSubmit = () => {
+    const newErrors = {
+        patientName: validatePatientName(formData.patientName),
+        doctorName: validateDoctorName(formData.doctorName),
+        contactNumber: validateContactNumber(formData.contactNumber),
+        unitsRequired: validateUnitsRequired(formData.unitsRequired),
+        address: validateAddress(formData.address),
+        Date: validateDate(formData.Date)
     };
 
+    setErrors(newErrors);
+
+    const hasErrors = Object.values(newErrors).some(error => error !== '');
+    const isEmptyField = !formData.patientName || !formData.doctorName ||
+        !formData.contactNumber || !formData.specialization ||
+        !formData.bloodType || !formData.unitsRequired ||
+        !formData.status || !formData.Date || !formData.Time || !formData.address;
+
+    if (hasErrors || isEmptyField) {
+        toast.error('Please fill all required fields correctly.');
+        return;
+    }
+
+    const requestData = {
+        PatientName: formData.patientName,
+        doctorName: formData.doctorName,
+        specialization: formData.specialization,
+        ContactNumber: formData.contactNumber,
+        BloodType: formData.bloodType,
+        UnitsRequired: formData.unitsRequired,
+        Status: formData.status,
+        USERID: formData.USERID,
+        Date: formData.Date,
+        Time: formData.Time,
+        address: formData.address
+    };
+
+    axiosInstance.post('/AddBloodRequest', requestData)
+        .then(response => {
+            console.log(response.data);
+            let successMessage = 'Blood request submitted successfully!';
+            
+            // Add additional info for urgent requests
+            if (formData.status === 'Very Urgent' || formData.status === 'Emergency') {
+                successMessage += ' Eligible donors have been notified via email.';
+            }
+            
+            toast.success(successMessage);
+            setFormData({
+                patientName: '',
+                doctorName: '',
+                contactNumber: '',
+                specialization: '',
+                bloodType: '',
+                unitsRequired: '',
+                status: '',
+                USERID: USERID,
+                Date: '',
+                Time: '',
+                address: ''
+            });
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            toast.error('Failed to submit blood request. Please try again.');
+        });
+};
     return (
         <Box className="main-container">
             <UserNav />
@@ -393,7 +399,7 @@ function UserBloodReq() {
                                     inputProps={{ min: 1, step: 1 }}
                                 />
                             </h5>
-                             
+
                             <h5>Status
                                 <Select
                                     name="status"
@@ -463,6 +469,9 @@ function UserBloodReq() {
                                     error={!!errors.Date}
                                     helperText={errors.Date}
                                     onBlur={handleBlur}
+                                    inputProps={{
+                                        min: getTodayDate() // This will prevent selecting past dates
+                                    }}
                                 />
                             </h5>
 

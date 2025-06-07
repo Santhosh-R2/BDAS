@@ -1,11 +1,12 @@
+/* Existing styles (as provided in your prompt) */
 .landing-container {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 2rem 5%;
     gap: 3rem;
-    min-height: calc(100vh - 60px); 
-    overflow-y: hidden;
+    min-height: calc(100vh - 60px);
+    overflow-y: hidden; /* This was existing, might prevent scroll within this specific container if content overflows */
     margin-top: 60px;
 }
 
@@ -20,7 +21,15 @@
     height: auto;
     max-height: 600px;
     object-fit: contain;
+    /* NEW: Image hover effect */
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; /* Added transition */
 }
+
+.blood-image:hover {
+    transform: scale(1.01); /* Subtle enlarge on hover for main image */
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15); /* Slightly more pronounced shadow on hover */
+}
+
 
 .welcome-container {
     flex: 1;
@@ -32,7 +41,7 @@
 
 .welcome-title {
     font-size: 3rem;
-    color: #d32f2f; 
+    color: #d32f2f;
     margin-bottom: 1.5rem;
     line-height: 1.2;
     text-align: center;
@@ -56,6 +65,14 @@
     background-color: #d32f2f !important;
     border-radius: 25px !important;
     text-transform: inherit !important;
+    /* NEW: Button hover effect */
+    transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.register-button:hover {
+    background-color: #a02121 !important; /* Slightly darker red on hover */
+    transform: translateY(-3px); /* Lift button slightly */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); /* Add a subtle shadow */
 }
 
 
@@ -64,17 +81,165 @@
         flex-direction: column;
         padding: 2rem;
     }
-    
+
     .welcome-container {
         text-align: center;
         align-items: center;
     }
-    
+
     .welcome-title {
         font-size: 2.2rem;
     }
-    
+
     .welcome-text {
         font-size: 1rem;
     }
+}
+
+/* --- NEW STYLES FOR ADDITIONAL SECTIONS --- */
+
+.info-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4rem 5%; /* More vertical padding for visual separation */
+    gap: 3rem;
+    background-color: #ffffff; /* Default background */
+
+    /* NEW: Box Shadow (replaces filter: drop-shadow) */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* Subtle shadow for the section itself */
+
+    /* NEW: Animation initial state (hidden and slightly moved) */
+    opacity: 0;
+    transform: translateY(20px); /* Start slightly below final position */
+
+    /* NEW: Animation properties */
+    animation: fadeInSlideUp 0.8s ease-out forwards; /* Apply animation */
+    /* NEW: Transition for hover effects on the entire section */
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+/* Staggered animation delays for successive sections (adjust based on your HTML structure after the first 'landing-container') */
+/* .info-section:nth-of-type(1) is the first .info-section after the nav and landing-container */
+.info-section:nth-of-type(1) { animation-delay: 0.1s; } /* "Why Your Donation Matters" */
+.info-section:nth-of-type(2) { animation-delay: 0.3s; } /* "Where Does Your Precious Gift Go?" */
+.info-section:nth-of-type(3) { animation-delay: 0.5s; } /* "Your Easy Path to Lifesaving" */
+.info-section:nth-of-type(4) { animation-delay: 0.7s; } /* "Committed to Community Health" (full-width-text) */
+
+
+/* Animation Keyframes */
+@keyframes fadeInSlideUp {
+    to {
+        opacity: 1; /* Fade in to full visibility */
+        transform: translateY(0); /* Slide up to original position */
+    }
+}
+
+/* Hover effect for the entire info-section (subtle shadow increase) */
+.info-section:hover {
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15); /* More pronounced shadow on hover */
+}
+
+
+/* Alternate background color for visual distinction between sections */
+.info-section:nth-of-type(odd) {
+    background-color: #f9f9f9; /* Light grey background for odd-numbered info-sections */
+}
+
+.info-section-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center; /* Center content horizontally */
+    text-align: center;
+}
+
+.info-section-image-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.info-section-image {
+    max-width: 100%;
+    height: auto;
+    max-height: 450px; /* Slightly smaller than the main hero image */
+    object-fit: contain;
+    border-radius: 8px; /* Slightly rounded corners for new images */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* Subtle shadow for depth */
+
+    /* NEW: Image hover effect */
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.info-section-image:hover {
+    transform: scale(1.03); /* Slightly enlarge on hover */
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15); /* Slightly more pronounced shadow on hover */
+}
+
+.info-section-title {
+    font-size: 2.5rem; /* Slightly smaller than main welcome title */
+    color: #d32f2f; /* Maintain primary color */
+    margin-bottom: 1.2rem;
+    line-height: 1.2;
+    text-align: center;
+}
+
+.info-section-text {
+    font-size: 1.1rem; /* Slightly smaller than main text */
+    color: #555; /* Slightly darker than existing text for contrast */
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+    max-width: 600px; /* Wider text block than welcome-text */
+    text-align: center;
+}
+
+/* Style to reverse the order of image and content for alternate sections */
+.info-section.reverse {
+    flex-direction: row-reverse;
+}
+
+/* Specific style for the full-width text section */
+.info-section.full-width-text {
+    justify-content: center; /* Center the content horizontally */
+    padding: 4rem 10%; /* More generous horizontal padding for text-only */
+    background-color: #f2f2f2; /* A distinct background for this section */
+}
+
+/* Ensure image container is not displayed in the full-width text section */
+.info-section.full-width-text .info-section-image-container {
+    display: none;
+}
+
+/* Make content wider in full-width text section */
+.info-section.full-width-text .info-section-content {
+    max-width: 800px; /* Allow text to spread more */
+}
+
+
+/* Responsive adjustments for new sections */
+@media (max-width: 768px) {
+    .info-section, .info-section.reverse {
+        flex-direction: column; /* Stack image and content vertically */
+        padding: 2.5rem 1.5rem; /* Adjust padding for smaller screens */
+        gap: 2rem; /* Reduce gap */
+    }
+
+    .info-section-title {
+        font-size: 2rem; /* Adjust title size */
+    }
+
+    .info-section-text {
+        font-size: 1rem; /* Adjust text size */
+    }
+
+    .info-section.full-width-text {
+        padding: 2.5rem 5%; /* Adjust padding for mobile */
+    }
+}
+
+/* Optional: Add a smooth scroll behavior to the whole page if you like */
+html {
+  scroll-behavior: smooth;
 }

@@ -25,7 +25,7 @@ const DonerSchema = new mongoose.Schema({
         type: [Date], 
         default: []   
       },
-          eligibility: { type: Boolean, default: false, required: true },
+          eligibility: { type: Boolean, default: true, required: true },
 });
 
 
