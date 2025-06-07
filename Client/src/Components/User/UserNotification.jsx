@@ -4,15 +4,17 @@ import CloseIcon from '@mui/icons-material/Close';
 import '../../Styles/Notification.css';
 import UserNav from './UserNav';
 import UserSideMenu from './UserSideMenu';
-import axios from 'axios';
+import axios from 'axios'; 
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import axiosInstance from '../Service/BaseUrl';
+import axiosInstance from '../Service/BaseUrl'; 
+
 function UserNotification() {
     const USERID = localStorage.getItem("UserId");
     const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [expandedNotification, setExpandedNotification] = useState(null);
+    const [expandedDonorNotification, setExpandedDonorNotification] = useState(null); 
+    const [expandedHospitalNotification, setExpandedHospitalNotification] = useState(null); 
 
     useEffect(() => {
         if (!USERID) {
@@ -25,11 +27,12 @@ function UserNotification() {
             try {
                 const response = await axiosInstance.get(`/ShowRequestUser/${USERID}`);
                 const requests = response.data;
+                console.log(requests);
                 
                 const pendingNotifications = requests.filter(request => 
                     request.ReadbyUser === "Pending" && (
                         request.IsDoner === "Accepted" || 
-                        request.IsHospital === "Accepted" || 
+                        request.IsHospital === "Approved" || 
                         (request.AcceptedByDoner && request.AcceptedByDoner.some(d => d.donationStatus === "Fulfilled"))
                     )
                 );
@@ -37,20 +40,31 @@ function UserNotification() {
                 const notificationList = pendingNotifications.map(request => {
                     let message = '';
                     let donorDetails = null;
-                    
+                    let hospitalDetails = null;
+                    let hasDonorInfo = false;
+                    let hasHospitalInfo = false;
+
                     if (request.AcceptedByDoner && request.AcceptedByDoner.some(d => d.donationStatus === "Fulfilled")) {
                         const fulfilledDonation = request.AcceptedByDoner.find(d => d.donationStatus === "Fulfilled");
                         donorDetails = fulfilledDonation.donerId;
-                        message = `Blood donation fulfilled for ${request.PatientName} by donor ${donorDetails.FullName}`;
+                        message = `Blood donation for ${request.PatientName} has been fulfilled by donor ${donorDetails.FullName}.`;
+                        hasDonorInfo = true;
                     } 
-                    else if (request.IsDoner === "Accepted" && request.IsHospital === "Accepted") {
-                        message = `Both donor and hospital accepted your request for ${request.PatientName}`;
+                    else if (request.IsHospital === "Approved" && request.AcceptedBy && request.AcceptedBy.FullName) {
+                        hospitalDetails = request.AcceptedBy;
+                        message = `Hospital ${hospitalDetails.FullName} has approved your blood request for ${request.PatientName}.`;
+                        hasHospitalInfo = true;
+                    }
+                    else if (request.IsDoner === "Accepted" && request.IsHospital === "Approved") {
+                        message = `Both a donor and a hospital have accepted your request for ${request.PatientName}.`;
                     } 
                     else if (request.IsDoner === "Accepted") {
-                        message = `Donor accepted your blood request for ${request.PatientName}`;
+                        message = `A donor has accepted your blood request for ${request.PatientName}.`;
                     } 
-                    else if (request.IsHospital === "Accepted") {
-                        message = `Hospital accepted your blood request for ${request.PatientName}`;
+                    else if (request.IsHospital === "Approved") {
+                        message = `A hospital has approved your blood request for ${request.PatientName}.`;
+                    } else {
+                        message = `Status update for your request for ${request.PatientName}.`;
                     }
 
                     return {
@@ -58,9 +72,11 @@ function UserNotification() {
                         message: message,
                         date: new Date(request.createdAt).toLocaleDateString(),
                         unread: true, 
-                        requestData: request,
+                        requestData: request, 
                         donorDetails: donorDetails,
-                        hasDonorInfo: !!donorDetails
+                        hasDonorInfo: hasDonorInfo,
+                        hospitalDetails: hospitalDetails,
+                        hasHospitalInfo: hasHospitalInfo
                     };
                 });
 
@@ -89,13 +105,15 @@ function UserNotification() {
         }
     };
 
-    const dismissNotification = (id) => {
-        setNotifications(notifications.filter(notification => notification.id !== id));
-        toast.success('Notification dismissed');
-    };
 
     const toggleDonorDetails = (id) => {
-        setExpandedNotification(expandedNotification === id ? null : id);
+        setExpandedDonorNotification(expandedDonorNotification === id ? null : id);
+        if (expandedDonorNotification !== id) setExpandedHospitalNotification(null);
+    };
+
+    const toggleHospitalDetails = (id) => {
+        setExpandedHospitalNotification(expandedHospitalNotification === id ? null : id);
+        if (expandedHospitalNotification !== id) setExpandedDonorNotification(null);
     };
 
     if (loading) {
@@ -132,15 +150,15 @@ function UserNotification() {
                                 {notification.hasDonorInfo && (
                                     <>
                                         <button 
-                                            className="view-donor-btn"
+                                            className="view-details-btn donor-btn" 
                                             onClick={() => toggleDonorDetails(notification.id)}
                                         >
-                                            {expandedNotification === notification.id ? 
+                                            {expandedDonorNotification === notification.id ? 
                                                 'Hide Donor Details' : 'View Donor Details'}
                                         </button>
                                         
-                                        {expandedNotification === notification.id && (
-                                            <div className="donor-details">
+                                        {expandedDonorNotification === notification.id && (
+                                            <div className="details-card donor-details"> 
                                                 <h4>Donor Information:</h4>
                                                 <p><strong>Name:</strong> {notification.donorDetails.FullName}</p>
                                                 <p><strong>Contact:</strong> {notification.donorDetails.PhoneNo}</p>
@@ -150,9 +168,35 @@ function UserNotification() {
                                                     new Date(
                                                         notification.requestData.AcceptedByDoner
                                                             .find(d => d.donationStatus === "Fulfilled")
-                                                            .AccepteddAt
+                                                            ?.AccepteddAt 
                                                     ).toLocaleString()
                                                 }</p>
+                                            </div>
+                                        )}
+                                    </>
+                                )}
+
+                                {notification.hasHospitalInfo && (
+                                    <>
+                                        <button 
+                                            className="view-details-btn hospital-btn" 
+                                            onClick={() => toggleHospitalDetails(notification.id)}
+                                        >
+                                            {expandedHospitalNotification === notification.id ? 
+                                                'Hide Hospital Details' : 'View Hospital Details'}
+                                        </button>
+                                        
+                                        {expandedHospitalNotification === notification.id && (
+                                            <div className="details-card hospital-details"> 
+                                                <h4>Hospital Information:</h4>
+                                                <p><strong>Name:</strong> {notification.hospitalDetails.FullName}</p>
+                                                <p><strong>Contact:</strong> {notification.hospitalDetails.PhoneNo}</p>
+                                                <p><strong>Email:</strong> {notification.hospitalDetails.Email}</p>
+                                                <p><strong>Address:</strong> {notification.hospitalDetails.Address}, {notification.hospitalDetails.Street}, {notification.hospitalDetails.City} - {notification.hospitalDetails.Pincode}</p>
+                                                <p><strong>Registration No:</strong> {notification.hospitalDetails.RegistrationNumber}</p>
+                                                {notification.requestData.HospitalApprovedAt && (
+                                                    <p><strong>Approved On:</strong> {new Date(notification.requestData.HospitalApprovedAt).toLocaleString()}</p>
+                                                )}
                                             </div>
                                         )}
                                     </>
@@ -165,12 +209,6 @@ function UserNotification() {
                                     >
                                         <CheckIcon />
                                     </button>
-                                    {/* <button 
-                                        className="action-button dismiss"
-                                        onClick={() => dismissNotification(notification.id)}
-                                    >
-                                        <CloseIcon />
-                                    </button> */}
                                 </div>
                             </div>
                         ))

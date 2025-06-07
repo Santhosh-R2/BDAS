@@ -163,7 +163,8 @@ function DonerBloodRequest() {
                     const currentDonorId = localStorage.getItem("DonerId");
 
                     const filteredRequests = response.data.filter(request => {
-                        if (request.IsHospital === "Approved") return false;
+                        // Keep hospital requests as they are now handled by HospitalId field
+                        // if (request.IsHospital === "Approved") return false; // This line might need review based on your actual data structure and intent
 
                         if (!request.BloodType) return false;
 
@@ -188,6 +189,8 @@ function DonerBloodRequest() {
                     });
 
                     setRequests(filteredRequests);
+                    console.log(filteredRequests);
+                    
                 } else {
                     setRequests([]);
                     toast.warning('No blood requests data found');
@@ -535,11 +538,20 @@ function DonerBloodRequest() {
                                                         </Typography>
                                                     </Box>
                                                 </TableCell>
-                                                <TableCell className="tableCell" >
+                                                {/* MODIFIED ADDRESS CELL */}
+                                                <TableCell className="tableCell">
                                                     <Box>
-                                                        <Typography>{request.address}</Typography>
+                                                        {request.HospitalId && typeof request.HospitalId === 'object' ? (
+                                                            <>
+                                                                <Typography>{request.HospitalId.Address || 'N/A'}</Typography>
+                                                                <Typography variant="body2">{request.HospitalId.City || 'N/A'}</Typography>
+                                                            </>
+                                                        ) : (
+                                                            <Typography>{request.address || 'N/A'}</Typography>
+                                                        )}
                                                     </Box>
                                                 </TableCell>
+                                                {/* END MODIFIED ADDRESS CELL */}
                                                 <TableCell className="tableCell">
                                                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: "center" }}>
                                                         {getStatusIndicator(request.Status)}

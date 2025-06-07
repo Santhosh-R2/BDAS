@@ -4,6 +4,7 @@ const bodyParser = require('body-parser')
 const db = require('./dbConnection')
 const cors = require('cors')
 const { exec } = require('child_process');
+require('dotenv').config()
 
 const PORT = 4058
 

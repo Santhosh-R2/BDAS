@@ -76,3 +76,70 @@
     background-color: #f44336;
     color: white;
 }
+/* Base style for buttons */
+.view-details-btn {
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    font-size: 0.9em;
+    transition: background-color 0.3s ease;
+}
+
+/* Specific style for donor button */
+.view-details-btn.donor-btn {
+    background-color: #007bff; /* Blue */
+    color: white;
+    margin-right: 10px; /* Space between buttons if both are present */
+}
+
+.view-details-btn.donor-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Specific style for hospital button */
+.view-details-btn.hospital-btn {
+    background-color: #28a745; /* Green */
+    color: white;
+}
+
+.view-details-btn.hospital-btn:hover {
+    background-color: #218838;
+}
+
+/* Base style for details cards */
+.details-card {
+    margin-top: 15px;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Specific style for donor details card */
+.details-card.donor-details {
+    background-color: #e0f7fa; /* Light blue */
+    border-left: 5px solid #007bff;
+}
+
+.details-card.donor-details h4 {
+    margin-top: 0;
+    color: #007bff;
+}
+
+/* Specific style for hospital details card */
+.details-card.hospital-details {
+    background-color: #e9f5e9; /* Light green */
+    border-left: 5px solid #28a745;
+}
+
+.details-card.hospital-details h4 {
+    margin-top: 0;
+    color: #28a745;
+}
+
+.details-card p {
+    margin: 5px 0;
+    font-size: 0.95em;
+    line-height: 1.4;
+}
