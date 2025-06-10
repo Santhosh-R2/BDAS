@@ -88,6 +88,8 @@ console.log(hospitalData);
 
     const handleLogout = () => {
         localStorage.removeItem('Hospital');
+                localStorage.removeItem('hospitalId');
+
         setOpenLogoutDialog(false);
         navigate('/');
     };
