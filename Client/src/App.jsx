@@ -60,6 +60,7 @@ import ContactUs from './Components/common/ContactUs';
 import DonerContactUs from './Components/Doner/DonerContactus';
 import DonerAboutUs from './Components/Doner/DonerAboutUs';
 import ViewAllUsers from './Components/Admin/ViewAllUsers';
+import ChatBot from './Components/ChatBot';
 
 const NavigationHandler = () => {
   const navigate = useNavigate();
@@ -158,6 +159,7 @@ function App() {
           <Route path="/user-view-requests" element={<ViewRequests />} />
           <Route path="/user-view-notifications" element={<UserNotification />} />
 
+          <Route path="/ChatBot" element={<ChatBot />} />
 
         </Routes>
       </Router>

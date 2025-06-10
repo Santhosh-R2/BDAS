@@ -1,15 +1,26 @@
-import React from 'react';
-import '../../Styles/AboutUs.css'; 
+import React, { useState } from 'react'; 
+import '../../Styles/AboutUs.css';
 import Nav from './Nav';
-import imageBlood from '../../Assets/imageBlood.jpg'
-import Clinic from '../../Assets/clinic.jpg'
+import imageBlood from '../../Assets/imageBlood.jpg';
+import Clinic from '../../Assets/clinic.jpg';
 
+import { Button, Box, Fab, Slide, IconButton, Typography } from '@mui/material';
+import ChatIcon from '@mui/icons-material/Chat';
+import CloseIcon from '@mui/icons-material/Close';
+
+import ChatBot from '../ChatBot'; 
 
 
 function AboutUs() {
+  const [showChatBot, setShowChatBot] = useState(false);
+
+  const handleToggleChatBot = () => {
+    setShowChatBot(!showChatBot);
+  };
+
   return (
     <div>
-      <Nav/> 
+      <Nav/>
 
       <div className='about-us-hero-container'>
         <div className='about-us-hero-text'>
@@ -71,6 +82,64 @@ function AboutUs() {
 
       <p className='copy-right'>© 2025 Blood Donor Availability System. All Rights Reserved </p>
 
+      <Fab
+        aria-label="chat"
+        sx={{
+          position: 'fixed',
+          bottom: 24,
+          right: 24,  
+          zIndex: 1100,
+          color:"red"
+        }}
+        onClick={handleToggleChatBot}
+      >
+        <ChatIcon />
+      </Fab>
+
+      <Slide direction="up" in={showChatBot} mountOnEnter unmountOnExit>
+        <Box
+          sx={{
+            position: 'fixed',
+            bottom: 90, 
+            right: 24,
+            width: { xs: '90%', sm: 380 }, 
+            height: '75vh', 
+            maxHeight: 600, 
+            zIndex: 1000, 
+            backgroundColor: 'background.paper', 
+            borderRadius: 3, 
+            boxShadow: 6, 
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          <Box sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            p: 2,
+            borderBottom: '1px solid',
+            borderColor: 'divider',
+            bgcolor: '#d32f2f', 
+            color: 'white', 
+            borderTopLeftRadius: 12, 
+            borderTopRightRadius: 12,
+            textAlign:"center" 
+          }}>
+            <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'center' }}>BDAS CHAT BOT</Typography> 
+            <IconButton
+              aria-label="close chat"
+              onClick={() => setShowChatBot(false)}
+              sx={{ color: 'white' }} 
+            >
+              <CloseIcon />
+            </IconButton>
+          </Box>
+          <Box sx={{ flexGrow: 1, overflow: 'hidden' }}> 
+            <ChatBot />
+          </Box>
+        </Box>
+      </Slide>
     </div>
   );
 }

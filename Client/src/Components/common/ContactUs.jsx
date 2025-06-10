@@ -7,12 +7,19 @@ import {
     TextField,
     Typography,
     CircularProgress,
-    Paper
+    Paper,
+    Fab,          
+    Slide,       
+    IconButton    
 } from '@mui/material';
+import ChatIcon from '@mui/icons-material/Chat';   
+import CloseIcon from '@mui/icons-material/Close'; 
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Nav from './Nav';
 import axiosInstance from '../Service/BaseUrl';
+
+import ChatBot from '../ChatBot'; 
 
 function ContactUs() {
     const [formData, setFormData] = useState({
@@ -24,6 +31,10 @@ function ContactUs() {
         message: ''
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showChatBot, setShowChatBot] = useState(false);
+    const handleToggleChatBot = () => {
+        setShowChatBot(!showChatBot);
+    };
 
     const validateEmail = (email) => {
         const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -46,13 +57,16 @@ function ContactUs() {
                 setErrors(prev => ({ ...prev, email: '' }));
             }
         }
+        if (name === 'message' && errors.message && value) {
+            setErrors(prev => ({ ...prev, message: '' }));
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         let isValid = true;
-        const newErrors = { ...errors };
+        const newErrors = { email: '', message: '' }; 
 
         if (!formData.email) {
             newErrors.email = 'Email is required';
@@ -89,7 +103,7 @@ function ContactUs() {
     };
 
     return (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', flexDirection: 'column' }}>
             <Nav />
             <ToastContainer
                 position="top-right"
@@ -103,7 +117,7 @@ function ContactUs() {
                 pauseOnHover
                 style={{ marginTop: "80px" }}
             />
-            <Container maxWidth="sm" sx={{ mt: 4, mb: 4 }}>
+            <Container maxWidth="sm" sx={{ mt: { xs: 10, sm: 12 }, mb: 4 }}> 
                 <Paper elevation={3} sx={{ p: 4 }}>
                     <h1 style={{ textAlign: 'center' }}>
                         Contact Us
@@ -133,8 +147,7 @@ function ContactUs() {
                                 error={!!errors.email}
                                 helperText={errors.email}
                                 required
-                                InputLabelProps={{ shrink: false }}
-                                sx={{ '& .MuiInputLabel-root': { display: 'none' } }}
+                                placeholder="Enter your email"
                             />
                         </Box>
 
@@ -154,8 +167,8 @@ function ContactUs() {
                                 required
                                 multiline
                                 rows={4}
-                                InputLabelProps={{ shrink: false }}
-                                sx={{ '& .MuiInputLabel-root': { display: 'none' } }}
+                                // InputLabelProps={{ shrink: false }} 
+                                placeholder="Type your message here..."
                             />
                         </Box>
 
@@ -181,6 +194,65 @@ function ContactUs() {
                     </Box>
                 </Paper>
             </Container>
+
+            <Fab
+                aria-label="chat"
+                sx={{
+                   position: 'fixed',
+                    bottom: 24, 
+                    right: 24,  
+                    zIndex: 1100,
+                    color:"red"
+                }}
+                onClick={handleToggleChatBot}
+            >
+                <ChatIcon />
+            </Fab>
+
+            {/* Chatbot Overlay */}
+            <Slide direction="up" in={showChatBot} mountOnEnter unmountOnExit>
+                <Box
+                    sx={{
+                        position: 'fixed',
+                        bottom: 90, 
+                        right: 24,
+                        width: { xs: '90%', sm: 380 }, 
+                        height: '75vh', 
+                        maxHeight: 600,
+                        zIndex: 1000, 
+                        backgroundColor: 'background.paper', 
+                        borderRadius: 3, 
+                        boxShadow: 6, 
+                        display: 'flex',
+                        flexDirection: 'column',
+                    }}
+                >
+                    <Box sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        p: 2,
+                        borderBottom: '1px solid',
+                        borderColor: 'divider',
+                        bgcolor: '#d32f2f', 
+                        color: 'white',
+                        borderTopLeftRadius: 12, 
+                        borderTopRightRadius: 12,
+                    }}>
+                        <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'center' }}>BDAS CHAT BOT</Typography>
+                        <IconButton
+                            aria-label="close chat"
+                            onClick={() => setShowChatBot(false)}
+                            sx={{ color: 'white' }} 
+                        >
+                            <CloseIcon />
+                        </IconButton>
+                    </Box>
+                    <Box sx={{ flexGrow: 1, overflow: 'hidden' }}> 
+                        <ChatBot />
+                    </Box>
+                </Box>
+            </Slide>
         </div>
     );
 }
