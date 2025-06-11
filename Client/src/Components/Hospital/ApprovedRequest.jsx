@@ -223,7 +223,7 @@ function ApprovedRequest() {
                                     <TableCell className="table-head-cell">Blood Type</TableCell>
                                     <TableCell className="table-head-cell">Units</TableCell>
                                     <TableCell className="table-head-cell">Date</TableCell>
-                                    <TableCell className="table-head-cell">Time</TableCell>
+                                    {/* <TableCell className="table-head-cell">Time</TableCell> */}
                                     <TableCell className="table-head-cell">Status</TableCell>
                                 </TableRow>
                             </TableHead>
@@ -256,9 +256,9 @@ function ApprovedRequest() {
                                                 <TableCell className="tableCell">
                                                     {formatDate(request.Date) || 'N/A'}
                                                 </TableCell>
-                                                <TableCell className="tableCell">
+                                                {/* <TableCell className="tableCell">
                                                     {formatTime(request.Time) || 'N/A'}
-                                                </TableCell>
+                                                </TableCell> */}
                                                 <TableCell className="tableCell">
                                                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: "center" }}>
                                                         {getStatusIndicator(request.Status)}
