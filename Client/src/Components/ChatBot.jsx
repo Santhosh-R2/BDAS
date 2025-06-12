@@ -97,6 +97,7 @@ function ChatBot() {
             flexDirection: 'column', 
             p: 2,
             pb: 1, 
+            minHeight: 0, // ADDED: Ensures this flex item can shrink properly
           }}
         >
           <Box
@@ -106,6 +107,7 @@ function ChatBot() {
               overflowY: "auto", 
               pr: 1, 
               mb: 2, 
+              minHeight: 0, // ADDED: Critical for scrollable flex items
             }}
           >
             <ChatBotHistory chatHistory={chatHistory} />
