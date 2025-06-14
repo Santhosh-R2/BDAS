@@ -11,7 +11,7 @@ const HospitalBloodReq = new mongoose.Schema({
   address: { type: String },
   doctorName: { type: String },
   HospitalId: { type: Schema.Types.ObjectId, ref: 'Hospital' },
-  USERID: { type: Schema.Types.ObjectId, ref: 'Users' },
+  USERID: { type: Schema.Types.ObjectId, ref: 'Users', required: true },
   Date: { type: Date },
   Time: { type: String },
   IsHospital: { type: String, default: 'Pending' },

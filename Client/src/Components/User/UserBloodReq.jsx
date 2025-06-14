@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
     Box,
     ListItemText,
@@ -12,12 +12,9 @@ import {
 } from '@mui/material';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import axios from 'axios';
+import axiosInstance from '../Service/BaseUrl';
 import UserNav from './UserNav';
 import UserSideMenu from './UserSideMenu';
-import axiosInstance from '../Service/BaseUrl';
-const USERID = localStorage.getItem("UserId");
-console.log(USERID);
 
 function UserBloodReq() {
     const bloodGroups = [
@@ -44,7 +41,7 @@ function UserBloodReq() {
         bloodType: '',
         unitsRequired: '',
         status: '',
-        USERID: USERID,
+        USERID: '',
         Date: '',
         Time: '',
         address: ''
@@ -58,6 +55,35 @@ function UserBloodReq() {
         Date: '',
         address: ''
     });
+
+    const [isLoading, setIsLoading] = React.useState(true);
+
+    useEffect(() => {
+        const initializeUserId = () => {
+            try {
+                const userIdFromStorage = localStorage.getItem("UserId");
+                const userDataFromStorage = JSON.parse(localStorage.getItem('User') || '{}');
+                
+                const userId = userIdFromStorage || userDataFromStorage._id;
+                
+                if (userId) {
+                    setFormData(prev => ({
+                        ...prev,
+                        USERID: userId
+                    }));
+                } else {
+                    toast.error('User identification failed. Please log in again.');
+                }
+            } catch (error) {
+                console.error("Error initializing user ID:", error);
+                toast.error('Error loading user data. Please refresh the page.');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        initializeUserId();
+    }, []);
 
     const getTodayDate = () => {
         const today = new Date();
@@ -119,13 +145,10 @@ function UserBloodReq() {
 
     const validateDate = (date) => {
         if (!date) return 'Date is required';
-
-        // Check if the date string matches YYYY-MM-DD format with 4-digit year
         const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
         if (!dateRegex.test(date)) {
             return 'Date must be in YYYY-MM-DD format';
         }
-
         return '';
     };
 
@@ -198,75 +221,97 @@ function UserBloodReq() {
             ...prev,
             [name]: error
         }));
-    }
-
-const handleSubmit = () => {
-    const newErrors = {
-        patientName: validatePatientName(formData.patientName),
-        doctorName: validateDoctorName(formData.doctorName),
-        contactNumber: validateContactNumber(formData.contactNumber),
-        unitsRequired: validateUnitsRequired(formData.unitsRequired),
-        address: validateAddress(formData.address),
-        Date: validateDate(formData.Date)
     };
 
-    setErrors(newErrors);
+    const handleSubmit = () => {
+        if (!formData.USERID) {
+            toast.error('User identification failed. Please log in again.');
+            return;
+        }
 
-    const hasErrors = Object.values(newErrors).some(error => error !== '');
-    const isEmptyField = !formData.patientName || !formData.doctorName ||
-        !formData.contactNumber || !formData.specialization ||
-        !formData.bloodType || !formData.unitsRequired ||
-        !formData.status || !formData.Date || !formData.Time || !formData.address;
+        const newErrors = {
+            patientName: validatePatientName(formData.patientName),
+            doctorName: validateDoctorName(formData.doctorName),
+            contactNumber: validateContactNumber(formData.contactNumber),
+            unitsRequired: validateUnitsRequired(formData.unitsRequired),
+            address: validateAddress(formData.address),
+            Date: validateDate(formData.Date)
+        };
 
-    if (hasErrors || isEmptyField) {
-        toast.error('Please fill all required fields correctly.');
-        return;
-    }
+        setErrors(newErrors);
 
-    const requestData = {
-        PatientName: formData.patientName,
-        doctorName: formData.doctorName,
-        specialization: formData.specialization,
-        ContactNumber: formData.contactNumber,
-        BloodType: formData.bloodType,
-        UnitsRequired: formData.unitsRequired,
-        Status: formData.status,
-        USERID: formData.USERID,
-        Date: formData.Date,
-        Time: formData.Time,
-        address: formData.address
-    };
+        const hasErrors = Object.values(newErrors).some(error => error !== '');
+        const isEmptyField = !formData.patientName || !formData.doctorName ||
+            !formData.contactNumber || !formData.specialization ||
+            !formData.bloodType || !formData.unitsRequired ||
+            !formData.status || !formData.Date || !formData.Time || !formData.address;
 
-    axiosInstance.post('/AddBloodRequest', requestData)
-        .then(response => {
-            console.log(response.data);
-            let successMessage = 'Blood request submitted successfully!';
-            
-            // Add additional info for urgent requests
-            if (formData.status === 'Very Urgent' || formData.status === 'Emergency') {
-                successMessage += ' Eligible donors have been notified via email.';
-            }
-            
-            toast.success(successMessage);
-            setFormData({
-                patientName: '',
-                doctorName: '',
-                contactNumber: '',
-                specialization: '',
-                bloodType: '',
-                unitsRequired: '',
-                status: '',
-                USERID: USERID,
-                Date: '',
-                Time: '',
-                address: ''
+        if (hasErrors || isEmptyField) {
+            toast.error('Please fill all required fields correctly.');
+            return;
+        }
+
+        const requestData = {
+            PatientName: formData.patientName,
+            doctorName: formData.doctorName,
+            specialization: formData.specialization,
+            ContactNumber: formData.contactNumber,
+            BloodType: formData.bloodType,
+            UnitsRequired: formData.unitsRequired,
+            Status: formData.status,
+            USERID: formData.USERID,
+            Date: formData.Date,
+            Time: formData.Time,
+            address: formData.address
+        };
+
+        setIsLoading(true);
+        axiosInstance.post('/AddBloodRequest', requestData)
+            .then(response => {
+                let successMessage = 'Blood request submitted successfully!';
+                
+                if (formData.status === 'Very Urgent' || formData.status === 'Emergency') {
+                    successMessage += ' Eligible donors have been notified via email.';
+                }
+                
+                toast.success(successMessage);
+                setFormData({
+                    patientName: '',
+                    doctorName: '',
+                    contactNumber: '',
+                    specialization: '',
+                    bloodType: '',
+                    unitsRequired: '',
+                    status: '',
+                    USERID: formData.USERID, 
+                    Date: '',
+                    Time: '',
+                    address: ''
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                toast.error('Failed to submit blood request. Please try again.');
+            })
+            .finally(() => {
+                setIsLoading(false);
             });
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            toast.error('Failed to submit blood request. Please try again.');
-        });
-};
+    };
+
+    if (isLoading) {
+        return (
+            <Box className="main-container">
+                <UserNav />
+                <Box className="sidemenu">
+                    <UserSideMenu />
+                    <Box className="content-box">
+                        <Typography variant="h6">Loading user data...</Typography>
+                    </Box>
+                </Box>
+            </Box>
+        );
+    }
+
     return (
         <Box className="main-container">
             <UserNav />
@@ -304,6 +349,7 @@ const handleSubmit = () => {
                                     onBlur={handleBlur}
                                     error={!!errors.patientName}
                                     helperText={errors.patientName}
+                                    disabled={isLoading}
                                 />
                             </h5>
 
@@ -317,6 +363,7 @@ const handleSubmit = () => {
                                     error={!!errors.contactNumber}
                                     helperText={errors.contactNumber}
                                     inputProps={{ maxLength: 15 }}
+                                    disabled={isLoading}
                                 />
                             </h5>
 
@@ -329,6 +376,7 @@ const handleSubmit = () => {
                                     onBlur={handleBlur}
                                     error={!!errors.doctorName}
                                     helperText={errors.doctorName}
+                                    disabled={isLoading}
                                 />
                             </h5>
 
@@ -341,6 +389,7 @@ const handleSubmit = () => {
                                     displayEmpty
                                     className='edit-input'
                                     error={!formData.specialization}
+                                    disabled={isLoading}
                                 >
                                     <MenuItem value="" disabled>
                                         Select Specialization
@@ -364,7 +413,6 @@ const handleSubmit = () => {
                                 </Select>
                             </h5>
 
-
                             <h5>Blood Type
                                 <Select
                                     name="bloodType"
@@ -374,6 +422,7 @@ const handleSubmit = () => {
                                     displayEmpty
                                     className='edit-input'
                                     error={!formData.bloodType}
+                                    disabled={isLoading}
                                 >
                                     <MenuItem value="" disabled>
                                         Blood Type
@@ -397,6 +446,7 @@ const handleSubmit = () => {
                                     error={!!errors.unitsRequired}
                                     helperText={errors.unitsRequired}
                                     inputProps={{ min: 1, step: 1 }}
+                                    disabled={isLoading}
                                 />
                             </h5>
 
@@ -409,6 +459,7 @@ const handleSubmit = () => {
                                     displayEmpty
                                     className='edit-input'
                                     error={!formData.status}
+                                    disabled={isLoading}
                                 >
                                     <MenuItem value="" disabled>
                                         Select Status
@@ -470,8 +521,9 @@ const handleSubmit = () => {
                                     helperText={errors.Date}
                                     onBlur={handleBlur}
                                     inputProps={{
-                                        min: getTodayDate() // This will prevent selecting past dates
+                                        min: getTodayDate()
                                     }}
+                                    disabled={isLoading}
                                 />
                             </h5>
 
@@ -483,6 +535,7 @@ const handleSubmit = () => {
                                     onChange={handleChange}
                                     type="time"
                                     InputLabelProps={{ shrink: true }}
+                                    disabled={isLoading}
                                 />
                             </h5>
 
@@ -497,6 +550,7 @@ const handleSubmit = () => {
                                     helperText={errors.address}
                                     multiline
                                     rows={3}
+                                    disabled={isLoading}
                                 />
                             </h5>
                             <Button
@@ -504,15 +558,16 @@ const handleSubmit = () => {
                                 color="primary"
                                 style={{ marginTop: '20px', width: '100%' }}
                                 onClick={handleSubmit}
+                                disabled={isLoading}
                             >
-                                Submit Request
+                                {isLoading ? 'Submitting...' : 'Submit Request'}
                             </Button>
                         </div>
                     </Box>
                 </Box>
             </Box>
         </Box>
-    )
+    );
 }
 
 export default UserBloodReq;

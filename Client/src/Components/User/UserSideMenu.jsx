@@ -28,7 +28,6 @@ function UserSideMenu() {
 
     const UserData = JSON.parse(localStorage.getItem('User') || '{}');
 
-    console.log(UserData);
     const UserProfile = UserData.ProfilePhoto?.filename
         ? `${baseUrl}${UserData.ProfilePhoto.filename}`
         : dp;
