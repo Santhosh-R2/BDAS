@@ -111,7 +111,7 @@ function UserDashboard() {
                 <Card elevation={3} sx={{ borderRadius: 2 }}>
                     <CardContent>
                         <Typography variant="h5" align="center" gutterBottom>
-                            Monthly Donor Count ({new Date().getFullYear()})
+                            Monthly Donor Donation Count ({new Date().getFullYear()})
                         </Typography>
                         <div style={{ height: '400px', marginTop: '20px' }}>
                             <ResponsiveContainer width="100%" height="100%">
