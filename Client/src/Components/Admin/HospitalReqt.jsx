@@ -13,9 +13,15 @@ import {
   Button,
   Box,
   Typography,
-  CircularProgress
+  CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Avatar
 } from '@mui/material';
 import axiosInstance from '../Service/BaseUrl';
+import { baseUrl } from '../../baseUrl';
 
 function HospitalReqt() {
   const [hospital, setHospital] = useState([]);
@@ -23,6 +29,10 @@ function HospitalReqt() {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [openDocumentDialog, setOpenDocumentDialog] = useState(false);
+  const [selectedDocument, setSelectedDocument] = useState(null);
+  const [isLoadingDocument, setIsLoadingDocument] = useState(false);
+  const [documentError, setDocumentError] = useState(null);
 
   useEffect(() => {
     axiosInstance.post('/viewAllHos')
@@ -87,6 +97,23 @@ function HospitalReqt() {
       .catch((error) => {
         console.error(error);
       });
+  };
+
+  const handleOpenDocument = (document) => {
+    setIsLoadingDocument(true);
+    setDocumentError(null);
+    setSelectedDocument(document);
+    setOpenDocumentDialog(true);
+  };
+
+  const handleCloseDocument = () => {
+    setOpenDocumentDialog(false);
+  };
+
+  const getProfilePhotoUrl = (hospital) => {
+    return hospital?.ProfilePhoto?.filename 
+      ? `${baseUrl}${hospital.ProfilePhoto.filename}`
+      : null;
   };
 
   if (loading) {
@@ -160,13 +187,14 @@ function HospitalReqt() {
             <Table aria-label="hospital requests table">
               <TableHead>
                 <TableRow className="table-head-row">
+                  <TableCell className="table-head-cell">Profile</TableCell>
                   <TableCell className="table-head-cell">Name</TableCell>
                   <TableCell className="table-head-cell">Req. Number</TableCell>
                   <TableCell className="table-head-cell">Contact</TableCell>
                   <TableCell className="table-head-cell">Email</TableCell>
                   <TableCell className="table-head-cell">City</TableCell>
                   <TableCell className="table-head-cell">Operating Hours</TableCell>
-                  <TableCell className="table-head-cell">License</TableCell>
+                  <TableCell className="table-head-cell">Document</TableCell>
                   <TableCell className="table-head-cell">Actions</TableCell>
                 </TableRow>
               </TableHead>
@@ -174,13 +202,30 @@ function HospitalReqt() {
                 {filteredHospitals.length > 0 ? (
                   filteredHospitals.map((hospital) => (
                     <TableRow key={hospital._id}>
+                      <TableCell className='tableCell'>
+                        <Avatar
+                          alt={hospital.FullName}
+                          src={getProfilePhotoUrl(hospital)}
+                          sx={{ width: 40, height: 40 }}
+                        />
+                      </TableCell>
                       <TableCell className='tableCell'>{hospital.FullName}</TableCell>
                       <TableCell className='tableCell'>{hospital.RegistrationNumber}</TableCell>
                       <TableCell className='tableCell'>{hospital.PhoneNo}</TableCell>
                       <TableCell className='tableCell'>{hospital.Email}</TableCell>
                       <TableCell className='tableCell'>{hospital.City}</TableCell>
                       <TableCell className='tableCell'>{hospital.OpeningTime} - {hospital.ClosingTime}</TableCell>
-                      <TableCell className='tableCell'>{hospital.RegistrationNumber}</TableCell>
+                      <TableCell className='tableCell'>
+                        {hospital.Document?.path ? (
+                          <Button 
+                            variant="outlined" 
+                            size="small"
+                            onClick={() => handleOpenDocument(hospital.Document)}
+                          >
+                            View
+                          </Button>
+                        ) : "N/A"}
+                      </TableCell>
                       <TableCell className="action-buttons">
                         <Button 
                           variant="contained" 
@@ -205,7 +250,7 @@ function HospitalReqt() {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={8} align="center" className="tableCell">
+                    <TableCell colSpan={9} align="center" className="tableCell">
                       <Box 
                         display="flex" 
                         alignItems="center" 
@@ -222,6 +267,66 @@ function HospitalReqt() {
               </TableBody>
             </Table>
           </TableContainer>
+
+          {/* Document Viewer Dialog */}
+          <Dialog
+            open={openDocumentDialog}
+            onClose={handleCloseDocument}
+            maxWidth="md"
+            fullWidth
+          >
+            <DialogTitle>
+              Hospital Document - {selectedDocument?.filename || "Unknown"}
+            </DialogTitle>
+            <DialogContent>
+              {isLoadingDocument && (
+                <Box display="flex" justifyContent="center" alignItems="center" height="200px">
+                  <CircularProgress />
+                </Box>
+              )}
+              {documentError && (
+                <Typography color="error" align="center">
+                  {documentError}
+                </Typography>
+              )}
+              
+              {selectedDocument?.mimetype?.includes('image') ? (
+                <img 
+                  src={`${baseUrl}${selectedDocument.filename}`} 
+                  alt="Hospital Document" 
+                  style={{ 
+                    width: '100%', 
+                    height: 'auto',
+                    display: isLoadingDocument ? 'none' : 'block' 
+                  }}
+                  onLoad={() => setIsLoadingDocument(false)}
+                  onError={() => {
+                    setIsLoadingDocument(false);
+                    setDocumentError('Failed to load image');
+                  }}
+                />
+              ) : (
+                <iframe 
+                  src={`${baseUrl}${selectedDocument?.filename}`} 
+                  style={{ 
+                    width: '100%', 
+                    height: '500px', 
+                    border: 'none',
+                    display: isLoadingDocument ? 'none' : 'block' 
+                  }}
+                  title="Hospital Document"
+                  onLoad={() => setIsLoadingDocument(false)}
+                  onError={() => {
+                    setIsLoadingDocument(false);
+                    setDocumentError('Failed to load document');
+                  }}
+                />
+              )}
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseDocument}>Close</Button>
+            </DialogActions>
+          </Dialog>
         </Box>
       </Box>
     </Box>

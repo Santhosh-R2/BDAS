@@ -59,14 +59,14 @@ function DonerBloodRequest() {
             const response = await axiosInstance.post(`/findDoner/${DonerId}`);
             const data = response.data.data;
             console.log(data);
-            
+
             setDonorData(data);
-            
-            const isHealthInfoComplete = 
+
+            const isHealthInfoComplete =
                 data.SurgicalHistory && data.SurgicalHistory.length > 0 &&
                 data.medicines && data.medicines.length > 0 &&
                 data.vaccinationsTaken && data.vaccinationsTaken.length > 0;
-            
+
             setHealthInfoComplete(isHealthInfoComplete);
         } catch (error) {
             console.error('Error fetching donor data:', error);
@@ -99,8 +99,8 @@ function DonerBloodRequest() {
     const checkDonationEligibility = () => {
         // Check if donor is pregnant or breastfeeding
         if (donorData.PregnancyorBreastfeed === "Yes") {
-            return { 
-                eligible: false, 
+            return {
+                eligible: false,
                 nextDate: null,
                 restrictionReason: "Pregnant or breastfeeding donors cannot donate blood for safety reasons."
             };
@@ -127,8 +127,8 @@ function DonerBloodRequest() {
 
         if (daysDiff < minDaysRequired) {
             const restrictionPeriod = donorData.Gender === "Female" ? "4 months" : "3 months";
-            return { 
-                eligible: false, 
+            return {
+                eligible: false,
                 nextDate: formattedNextDate,
                 restrictionReason: `You can only donate blood once every ${restrictionPeriod}. Your next eligible donation date is ${formattedNextDate}.`
             };
@@ -163,8 +163,8 @@ function DonerBloodRequest() {
                     const currentDonorId = localStorage.getItem("DonerId");
 
                     const filteredRequests = response.data.filter(request => {
-                        // Keep hospital requests as they are now handled by HospitalId field
-                        // if (request.IsHospital === "Approved") return false; // This line might need review based on your actual data structure and intent
+                       
+                        if (request.IsHospital === "Approved") return false;
 
                         if (!request.BloodType) return false;
 
@@ -190,7 +190,7 @@ function DonerBloodRequest() {
 
                     setRequests(filteredRequests);
                     console.log(filteredRequests);
-                    
+
                 } else {
                     setRequests([]);
                     toast.warning('No blood requests data found');
@@ -238,7 +238,7 @@ function DonerBloodRequest() {
                 monetary: parseInt(predictionData.monetary),
                 time: parseInt(predictionData.time)
             });
-            
+
             if (response.data && response.data.data) {
                 setPredictionResult(response.data.data);
             } else {
@@ -477,8 +477,8 @@ function DonerBloodRequest() {
 
                     {!healthInfoComplete && (
                         <Alert severity="warning" sx={{ mb: 3 }}>
-                            Please complete your health information 
-                            <Link to="/doner-edit-profile" style={{ textDecoration: 'none', color: '#1976d2' , fontSize:"17px"}} className='waring-profile-incomplete'> Click Here</Link>
+                            Please complete your health information
+                            <Link to="/doner-edit-profile" style={{ textDecoration: 'none', color: '#1976d2', fontSize: "17px" }} className='waring-profile-incomplete'> Click Here</Link>
                         </Alert>
                     )}
 
@@ -509,8 +509,8 @@ function DonerBloodRequest() {
 
                                         const { eligible, nextDate, restrictionReason } = checkDonationEligibility();
                                         const tooltipText = eligible
-                                            ? healthInfoComplete 
-                                                ? "Accept this request" 
+                                            ? healthInfoComplete
+                                                ? "Accept this request"
                                                 : "Complete your health information to accept requests"
                                             : restrictionReason;
 
@@ -620,143 +620,144 @@ function DonerBloodRequest() {
             )}
 
             {/* Donation Prediction Dialog */}
-<Dialog
-    open={predictionDialogOpen}
-    onClose={handleClosePredictionDialog}
-    maxWidth="sm"
-    fullWidth
->
-    <DialogTitle style={{textAlign:"center"}}>
-        <Typography variant="h5" fontWeight="bold">
-            Donation Prediction
-        </Typography>
-        <Typography variant="subtitle2">
-            Please provide your donation history details
-        </Typography>
-    </DialogTitle>
-    <DialogContent>
-        {!predictionResult ? (
-            <>
-                <TextField
-                    fullWidth
-                    margin="normal"
-                    label="Months since last donation"
-                    name="recency"
-                    type="number"
-                    value={predictionData.recency}
-                    onChange={handlePredictionInputChange}
-                    inputProps={{ min: 0 }}
-                />
-                <TextField
-                    fullWidth
-                    margin="normal"
-                    label="Total number of donations"
-                    name="frequency"
-                    type="number"
-                    value={predictionData.frequency}
-                    onChange={handlePredictionInputChange}
-                    inputProps={{ min: 0 }}
-                />
-                <TextField
-                    fullWidth
-                    margin="normal"
-                    label="Total blood donated (c.c.)"
-                    name="monetary"
-                    type="number"
-                    value={predictionData.monetary}
-                    onChange={handlePredictionInputChange}
-                    inputProps={{ min: 0 }}
-                />
-                <TextField
-                    fullWidth
-                    margin="normal"
-                    label="Months since first donation"
-                    name="time"
-                    type="number"
-                    value={predictionData.time}
-                    onChange={handlePredictionInputChange}
-                    inputProps={{ min: 0 }}
-                />
-            </>
-        ) : (
-            <>
-                <Alert 
-                    severity={predictionResult.class === 1 ? 'success' : 'warning'}
-                    sx={{ mb: 2 }}
-                >
-                    <Typography variant="body1" fontWeight="bold">
-                        Prediction: {predictionResult.class === 1 ? 'Likely to donate' : 'Unlikely to donate'}
+            <Dialog
+                open={predictionDialogOpen}
+                onClose={handleClosePredictionDialog}
+                maxWidth="sm"
+                fullWidth
+            >
+                <DialogTitle style={{ textAlign: "center" }}>
+                    <Typography variant="h5" fontWeight="bold">
+                        Donation Prediction
                     </Typography>
-                    <Typography variant="body2">
-                        Probability: {(predictionResult.probability * 100).toFixed(2)}%
+                    <Typography variant="subtitle2">
+                        Please provide your donation history details
                     </Typography>
-                    {predictionResult.message && (
-                        <Typography variant="body2" sx={{ mt: 1 }}>
-                            {predictionResult.message}
-                        </Typography>
+                </DialogTitle>
+                <DialogContent>
+                    {!predictionResult ? (
+                        <>
+                            <TextField
+                                fullWidth
+                                margin="normal"
+                                label="Months since last donation"
+                                name="recency"
+                                type="number"
+                                value={predictionData.recency}
+                                onChange={handlePredictionInputChange}
+                                inputProps={{ min: 0 }}
+                            />
+                            <TextField
+                                fullWidth
+                                margin="normal"
+                                label="Total number of donations"
+                                name="frequency"
+                                type="number"
+                                value={predictionData.frequency}
+                                onChange={handlePredictionInputChange}
+                                inputProps={{ min: 0 }}
+                            />
+                            <TextField
+                                fullWidth
+                                margin="normal"
+                                label="Total blood donated (c.c.)"
+                                name="monetary"
+                                type="number"
+                                value={predictionData.monetary}
+                                onChange={handlePredictionInputChange}
+                                inputProps={{ min: 0 }}
+                            />
+                            <TextField
+                                fullWidth
+                                margin="normal"
+                                label="Months since first donation"
+                                name="time"
+                                type="number"
+                                value={predictionData.time}
+                                onChange={handlePredictionInputChange}
+                                inputProps={{ min: 0 }}
+                            />
+                        </>
+                    ) : (
+                        <>
+                            <Alert
+                                severity={predictionResult.class === 1 ? 'success' : 'warning'}
+                                sx={{ mb: 2 }}
+                            >
+                                <Typography variant="body1" fontWeight="bold">
+                                    Prediction: {predictionResult.class === 1 ? 'Likely to donate' : 'Unlikely to donate'}
+                                </Typography>
+                                <Typography variant="body2">
+                                    Probability: {(predictionResult.probability * 100).toFixed(2)}%
+                                </Typography>
+                                {predictionResult.message && (
+                                    <Typography variant="body2" sx={{ mt: 1 }}>
+                                        {predictionResult.message}
+                                    </Typography>
+                                )}
+                            </Alert>
+                        </>
                     )}
-                </Alert>
-            </>
-        )}
-    </DialogContent>
-    <DialogActions sx={{ justifyContent: 'space-between', padding: '16px 24px' }}>
-        {!predictionResult ? (
-            <>
-                <Button 
-                    onClick={handleClosePredictionDialog}
-                    color="secondary"
-                    sx={{ marginRight: 'auto' }}  // Aligns to the left
-                >
-                    Cancel
-                </Button>
-                <Button
-                    onClick={handlePredictionSubmit}
-                    color="primary"
-                    disabled={predictionLoading || 
-                        !predictionData.recency || 
-                        !predictionData.frequency || 
-                        !predictionData.monetary || 
-                        !predictionData.time}
-                    startIcon={predictionLoading ? <CircularProgress size={20} /> : null}
-                    sx={{ marginLeft: 'auto' }}  // Aligns to the right
-                >
-                    {predictionLoading ? 'Predicting...' : 'Predict'}
-                </Button>
-            </>
-        ) : (
-            <>
-                {predictionResult.class === 1 ? (
-                    <>
-                        <Button 
-                            onClick={() => setPredictionResult(null)}
-                            color="secondary"
-                            sx={{ marginRight: 'auto' }}  // Aligns to the left
-                        >
-                            Back
-                        </Button>
-                        <Button
-                            onClick={handleConfirmAccept}
-                            color="primary"
-                            disabled={approvingId === currentRequestId}
-                            startIcon={approvingId === currentRequestId ? <CircularProgress size={20} /> : null}
-                            sx={{ marginLeft: 'auto' }}  // Aligns to the right
-                        >
-                            {approvingId === currentRequestId ? 'Approving...' : 'Confirm Donation'}
-                        </Button>
-                    </>
-                ) : (
-                    <Button
-                        onClick={handleClosePredictionDialog}
-                        color="primary"
-                        sx={{ width: '100%' }}  // Makes the Close button full width
-                    >
-                        Close
-                    </Button>
-                )}
-            </>
-        )}
-    </DialogActions>
-</Dialog>        </Box>
+                </DialogContent>
+                <DialogActions sx={{ justifyContent: 'space-between', padding: '16px 24px' }}>
+                    {!predictionResult ? (
+                        <>
+                            <Button
+                                onClick={handleClosePredictionDialog}
+                                color="secondary"
+                                sx={{ marginRight: 'auto' }} 
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                onClick={handlePredictionSubmit}
+                                color="primary"
+                                disabled={predictionLoading ||
+                                    !predictionData.recency ||
+                                    !predictionData.frequency ||
+                                    !predictionData.monetary ||
+                                    !predictionData.time}
+                                startIcon={predictionLoading ? <CircularProgress size={20} /> : null}
+                                sx={{ marginLeft: 'auto' }}  
+                            >
+                                {predictionLoading ? 'Predicting...' : 'Predict'}
+                            </Button>
+                        </>
+                    ) : (
+                        <>
+                            {predictionResult.class === 1 ? (
+                                <>
+                                    <Button
+                                        onClick={() => setPredictionResult(null)}
+                                        color="secondary"
+                                        sx={{ marginRight: 'auto' }}  
+                                    >
+                                        Back
+                                    </Button>
+                                    <Button
+                                        onClick={handleConfirmAccept}
+                                        color="primary"
+                                        disabled={approvingId === currentRequestId}
+                                        startIcon={approvingId === currentRequestId ? <CircularProgress size={20} /> : null}
+                                        sx={{ marginLeft: 'auto' }}  
+                                    >
+                                        {approvingId === currentRequestId ? 'Approving...' : 'Confirm Donation'}
+                                    </Button>
+                                </>
+                            ) : (
+                                <Button
+                                    onClick={handleClosePredictionDialog}
+                                    color="primary"
+                                    sx={{ width: '100%' }}  
+                                >
+                                    Close
+                                </Button>
+                            )}
+                        </>
+                    )}
+                </DialogActions>
+            </Dialog>        
+            </Box>
     );
 }
 

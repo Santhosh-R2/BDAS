@@ -375,9 +375,16 @@ function Approving() {
                                                             </Typography>
                                                         </Box>
                                                     </TableCell>
-                                                    <TableCell className="tableCell" >
+                                                    <TableCell className="tableCell">
                                                         <Box>
-                                                            <Typography>{request.address}</Typography>
+                                                            {request.HospitalId && typeof request.HospitalId === 'object' ? (
+                                                                <>
+                                                                    <Typography>{request.HospitalId.Address || 'N/A'}</Typography>
+                                                                    <Typography variant="body2">{request.HospitalId.City || 'N/A'}</Typography>
+                                                                </>
+                                                            ) : (
+                                                                <Typography>{request.address || 'N/A'}</Typography>
+                                                            )}
                                                         </Box>
                                                     </TableCell>
                                                     <TableCell className="tableCell">
@@ -416,7 +423,7 @@ function Approving() {
                                                                 variant="outlined"
                                                                 style={{ backgroundColor: "#E53935", color: "white" }}
                                                                 onClick={() => handleReject(request._id)}
-                                                                disabled={rejectingId === request._id || hasDonated}
+                                                                // disabled={rejectingId === request._id || hasDonated}
                                                                 size="small"
                                                             >
                                                                 {rejectingId === request._id ? (
