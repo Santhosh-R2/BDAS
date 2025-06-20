@@ -1,46 +1,45 @@
-/* Existing styles */
-.about-us-hero-container { /* Renamed from .about-us-main-container */
+.about-us-hero-container { 
     background-image: url('../Assets/aboutBg.png');
-    height: 94vh; /* Use 94vh if Nav is 6vh, or adjust based on actual Nav height */
+    height: 94vh; 
     width: 100%;
     background-position: center;
     background-size: cover;
     display: flex;
     justify-content: center;
     align-items: center;
-    position: relative; /* Needed for text overlay */
+    position: relative; 
     text-align: center;
-    padding-top: 60px; /* Adjust if Nav is fixed and 60px tall */
+    padding-top: 60px;
 }
 
-.about-us-hero-container::before { /* Optional: Add a dark overlay for better text readability */
+.about-us-hero-container::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.4); /* Dark overlay */
+    background-color: rgba(0, 0, 0, 0.4); 
     z-index: 1;
 }
 
-.about-us-hero-text { /* Renamed from .about-us-paragraph */
+.about-us-hero-text { 
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     padding: 30px;
-    width: 60vw; /* Wider for more impactful text */
-    background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent white background */
+    width: 60vw; 
+    background-color: rgba(255, 255, 255, 0.9); 
     border-radius: 15px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-    z-index: 2; /* Ensure text is above overlay */
+    z-index: 2; 
     text-align: center;
 }
 
 .about-us-hero-text h1 {
-    font-size: 3.5rem; /* Larger hero title */
-    color: #d32f2f; /* Primary color */
+    font-size: 3.5rem; 
+    color: #d32f2f; 
     margin-bottom: 1rem;
     line-height: 1.2;
 }
@@ -52,35 +51,33 @@
 }
 
 
-/* --- NEW STYLES FOR ADDITIONAL SECTIONS --- */
 
 .about-section {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 5rem 8%; /* Generous padding for content */
+    padding: 5rem 8%; 
     gap: 3rem;
     background-color: #ffffff;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05); /* Subtle shadow for definition */
-    margin-bottom: 20px; /* Space between sections */
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
+    margin-bottom: 20px; 
     transition: box-shadow 0.3s ease-in-out;
 }
 
 .about-section:hover {
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1); /* Subtle hover effect */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1); 
 }
 
-/* Alternate background color for visual distinction */
-.about-section:nth-of-type(odd) { /* Targets 1st, 3rd, 5th 'section' after Nav and hero */
+.about-section:nth-of-type(odd) {
     background-color: #f9f9f9;
 }
 
 .about-content {
-    flex: 1.5; /* Content takes more space than image */
+    flex: 1.5; 
     display: flex;
     flex-direction: column;
     justify-content: center;
-    text-align: left; /* Default to left-aligned text */
+    text-align: left; 
 }
 
 .about-section.center-content .about-content {
@@ -98,7 +95,7 @@
 .about-image {
     max-width: 100%;
     height: auto;
-    max-height: 400px; /* Max height for section images */
+    max-height: 400px; 
     object-fit: cover;
     border-radius: 8px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
@@ -115,13 +112,13 @@
     color: #d32f2f;
     margin-bottom: 1.5rem;
     line-height: 1.2;
-    text-align: center; /* Center section titles by default */
-    width: 100%; /* Ensure centering works */
+    text-align: center; 
+    width: 100%; 
 }
 
 .about-content h3 {
     font-size: 1.8rem;
-    color: #3f51b5; /* A secondary accent color */
+    color: #3f51b5; 
     margin-top: 2rem;
     margin-bottom: 1rem;
 }
@@ -131,51 +128,48 @@
     color: #444;
     line-height: 1.8;
     margin-bottom: 1rem;
-    max-width: 700px; /* Control text width for readability */
-    margin-left: auto; /* For centering when content is centered */
-    margin-right: auto; /* For centering when content is centered */
+    max-width: 700px; 
+    margin-left: auto; 
+    margin-right: auto;
 }
 
 .about-content ul {
     font-size: 1.1rem;
     color: #444;
     line-height: 1.8;
-    margin-left: 20px; /* Indent lists */
+    margin-left: 20px; 
     margin-bottom: 1rem;
     max-width: 700px;
-    list-style-type: disc; /* Default disc style */
+    list-style-type: disc; 
 }
 
 .about-content ul li strong {
-    color: #d32f2f; /* Highlight important terms */
+    color: #d32f2f; 
 }
 
-/* Style to reverse the order of image and content for alternate sections */
 .about-section.reverse {
     flex-direction: row-reverse;
 }
 
-/* Specific style for the full-width text section */
 .about-section.full-width-text {
     justify-content: center;
-    padding: 5rem 10%; /* More horizontal padding for text-only */
-    background-color: #e8eaf6; /* A distinct background for this section */
+    padding: 5rem 10%; 
+    background-color: #e8eaf6; 
     text-align: center;
 }
 
 .about-section.full-width-text .about-content {
-    flex: none; /* Remove flex sizing */
-    max-width: 900px; /* Allow text to spread more */
-    margin: 0 auto; /* Center the block */
-    align-items: center; /* Center internal items */
+    flex: none; 
+    max-width: 900px; 
+    margin: 0 auto; 
+    align-items: center; 
 }
 
 .about-section.full-width-text h2 {
-    color: #3f51b5; /* Match this section's theme */
+    color: #3f51b5; 
 }
 
 
-/* Footer/Copyright */
 .copy-right {
     text-align: center;
     padding: 2rem 0;
@@ -185,7 +179,6 @@
     margin-top: 20px;
 }
 
-/* Responsive adjustments */
 @media (max-width: 1024px) {
     .about-us-hero-text h1 {
         font-size: 3rem;
@@ -203,7 +196,7 @@
 
 @media (max-width: 768px) {
     .about-us-hero-container {
-        height: 70vh; /* Adjust hero height for mobile */
+        height: 70vh; 
         padding-top: 50px;
     }
     .about-us-hero-text {
@@ -218,13 +211,13 @@
     }
 
     .about-section, .about-section.reverse {
-        flex-direction: column; /* Stack image and content vertically */
-        padding: 3rem 5%; /* Adjust padding for smaller screens */
+        flex-direction: column; 
+        padding: 3rem 5%; 
         gap: 2rem;
     }
 
     .about-content {
-        text-align: center; /* Center content on mobile */
+        text-align: center; 
         align-items: center;
     }
 
@@ -236,13 +229,13 @@
     }
     .about-content p, .about-content ul {
         font-size: 0.95rem;
-        max-width: 90%; /* Allow text to take more width */
+        max-width: 90%; 
         margin-left: auto;
         margin-right: auto;
     }
     .about-content ul {
-        text-align: left; /* Keep list items left-aligned within their centered block */
-        list-style-position: inside; /* Puts bullets inside content box */
+        text-align: left; 
+        list-style-position: inside; 
     }
 
     .about-section.full-width-text {

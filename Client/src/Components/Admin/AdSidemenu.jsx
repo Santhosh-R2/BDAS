@@ -78,10 +78,10 @@ function AdSidemenu() {
                                     className={`menu-header ${isActive(item.path) ? 'active' : ''}`}
                                     onClick={toggleHospital}
                                 >
-                                    <Link to={item.path} className='menu-link'>
+                                    <div className='menu-link'>
                                         <img src={item.icon} alt={item.name} className='sidemenu-icons'/>
                                         <span>{item.name}</span>
-                                    </Link>
+                                    </div>
                                     {openHospital ? <ExpandLess className='dropdown-icon' /> : <ExpandMore className='dropdown-icon' />}
                                 </div>
                                 

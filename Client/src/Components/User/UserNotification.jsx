@@ -4,17 +4,16 @@ import CloseIcon from '@mui/icons-material/Close';
 import '../../Styles/Notification.css';
 import UserNav from './UserNav';
 import UserSideMenu from './UserSideMenu';
-import axios from 'axios'; 
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import axiosInstance from '../Service/BaseUrl'; 
+import axiosInstance from '../Service/BaseUrl';
 
 function UserNotification() {
     const USERID = localStorage.getItem("UserId");
     const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [expandedDonorNotification, setExpandedDonorNotification] = useState(null); 
-    const [expandedHospitalNotification, setExpandedHospitalNotification] = useState(null); 
+    const [expandedDonorNotification, setExpandedDonorNotification] = useState(null);
+    const [expandedHospitalNotification, setExpandedHospitalNotification] = useState(null);
 
     useEffect(() => {
         if (!USERID) {
@@ -27,58 +26,68 @@ function UserNotification() {
             try {
                 const response = await axiosInstance.get(`/ShowRequestUser/${USERID}`);
                 const requests = response.data;
-                console.log(requests);
-                
-                const pendingNotifications = requests.filter(request => 
-                    request.ReadbyUser === "Pending" && (
-                        request.IsDoner === "Accepted" || 
-                        request.IsHospital === "Approved" || 
-                        (request.AcceptedByDoner && request.AcceptedByDoner.some(d => d.donationStatus === "Fulfilled"))
-                    )
-                );
+                console.log("Fetched Requests:", requests);
 
-                const notificationList = pendingNotifications.map(request => {
-                    let message = '';
-                    let donorDetails = null;
-                    let hospitalDetails = null;
-                    let hasDonorInfo = false;
-                    let hasHospitalInfo = false;
-
-                    if (request.AcceptedByDoner && request.AcceptedByDoner.some(d => d.donationStatus === "Fulfilled")) {
-                        const fulfilledDonation = request.AcceptedByDoner.find(d => d.donationStatus === "Fulfilled");
-                        donorDetails = fulfilledDonation.donerId;
-                        message = `Blood donation for ${request.PatientName} has been fulfilled by donor ${donorDetails.FullName}.`;
-                        hasDonorInfo = true;
-                    } 
-                    else if (request.IsHospital === "Approved" && request.AcceptedBy && request.AcceptedBy.FullName) {
-                        hospitalDetails = request.AcceptedBy;
-                        message = `Hospital ${hospitalDetails.FullName} has approved your blood request for ${request.PatientName}.`;
-                        hasHospitalInfo = true;
-                    }
-                    else if (request.IsDoner === "Accepted" && request.IsHospital === "Approved") {
-                        message = `Both a donor and a hospital have accepted your request for ${request.PatientName}.`;
-                    } 
-                    else if (request.IsDoner === "Accepted") {
-                        message = `A donor has accepted your blood request for ${request.PatientName}.`;
-                    } 
-                    else if (request.IsHospital === "Approved") {
-                        message = `A hospital has approved your blood request for ${request.PatientName}.`;
-                    } else {
-                        message = `Status update for your request for ${request.PatientName}.`;
+                const notificationList = requests.flatMap(request => {
+                    if (request.ReadbyUser !== "Pending") {
+                        return []; 
                     }
 
-                    return {
-                        id: request._id,
-                        message: message,
-                        date: new Date(request.createdAt).toLocaleDateString(),
-                        unread: true, 
-                        requestData: request, 
-                        donorDetails: donorDetails,
-                        hasDonorInfo: hasDonorInfo,
-                        hospitalDetails: hospitalDetails,
-                        hasHospitalInfo: hasHospitalInfo
-                    };
+                    const generatedNotifications = [];
+
+                    const fulfilledDonations = request.AcceptedByDoner?.filter(
+                        d => d.donationStatus === "Fulfilled"
+                    ) || [];
+
+                    if (fulfilledDonations.length > 0) {
+                        fulfilledDonations.forEach(donation => {
+                            generatedNotifications.push({
+                                id: `${request._id}-${donation.donerId._id}`,
+                                originalRequestId: request._id, 
+                                message: `Blood donation for ${request.PatientName} has been fulfilled by donor ${donation.donerId.FullName}.`,
+                                date: new Date(donation.AccepteddAt).toLocaleString(),
+                                requestData: request,
+                                donorDetails: donation.donerId,
+                                donationInfo: donation, 
+                                hasDonorInfo: true,
+                                hospitalDetails: null,
+                                hasHospitalInfo: false,
+                            });
+                        });
+                    }
+
+                    if (request.IsHospital === "Approved" && request.AcceptedBy?.FullName) {
+                         generatedNotifications.push({
+                            id: `${request._id}-hospital`,
+                            originalRequestId: request._id,
+                            message: `Hospital ${request.AcceptedBy.FullName} has approved your blood request for ${request.PatientName}.`,
+                            date: new Date(request.HospitalApprovedAt || request.createdAt).toLocaleString(),
+                            requestData: request,
+                            donorDetails: null,
+                            hasDonorInfo: false,
+                            hospitalDetails: request.AcceptedBy,
+                            hasHospitalInfo: true,
+                        });
+                    }
+                    
+                    if (generatedNotifications.length === 0) {
+                        if (request.IsDoner === "Accepted") {
+                            generatedNotifications.push({
+                                id: request._id,
+                                originalRequestId: request._id,
+                                message: `A donor has accepted your blood request for ${request.PatientName}.`,
+                                date: new Date(request.createdAt).toLocaleDateString(),
+                                requestData: request,
+                                hasDonorInfo: false,
+                                hasHospitalInfo: false,
+                            });
+                        }
+                    }
+
+                    return generatedNotifications;
                 });
+
+                console.log("Generated Notifications:", notificationList);
 
                 setNotifications(notificationList);
                 setLoading(false);
@@ -92,19 +101,20 @@ function UserNotification() {
         fetchNotifications();
     }, [USERID]);
 
-    const markAsRead = async (id) => {
+    const markAsRead = async (originalRequestId) => {
         try {
-            await axiosInstance.patch(`/notifications/${id}/user-read`);
-            
-            setNotifications(notifications.filter(notification => notification.id !== id));
-            
+            await axiosInstance.patch(`/notifications/${originalRequestId}/user-read`);
+
+            setNotifications(prevNotifications =>
+                prevNotifications.filter(notification => notification.originalRequestId !== originalRequestId)
+            );
+
             toast.success('Notification marked as read');
         } catch (error) {
             console.error('Error marking notification as read:', error);
             toast.error('Failed to mark notification as read');
         }
     };
-
 
     const toggleDonorDetails = (id) => {
         setExpandedDonorNotification(expandedDonorNotification === id ? null : id);
@@ -119,8 +129,8 @@ function UserNotification() {
     if (loading) {
         return (
             <div className="admin-layout">
-                <UserNav/>
-                <UserSideMenu/>
+                <UserNav />
+                <UserSideMenu />
                 <div className="notification-content">
                     <h1 className="notification-title">Notification</h1>
                     <p>Loading notifications...</p>
@@ -131,46 +141,40 @@ function UserNotification() {
 
     return (
         <div className="admin-layout">
-            <UserNav/>
-            <UserSideMenu/>
+            <UserNav />
+            <UserSideMenu />
             <div className="notification-content">
                 <h1 className="notification-title"> Notifications</h1>
                 <div className="notification-list">
                     {notifications.length > 0 ? (
                         notifications.map((notification) => (
-                            <div 
+                            <div
                                 key={notification.id} 
-                                className="notification-card unread" 
+                                className="notification-card unread"
                             >
                                 <p className="notification-message">{notification.message}</p>
                                 <p className="notification-date">
                                     <strong>Date:</strong> {notification.date}
                                 </p>
-                                
+
                                 {notification.hasDonorInfo && (
                                     <>
-                                        <button 
-                                            className="view-details-btn donor-btn" 
+                                        <button
+                                            className="view-details-btn donor-btn"
                                             onClick={() => toggleDonorDetails(notification.id)}
                                         >
-                                            {expandedDonorNotification === notification.id ? 
-                                                'Hide Donor Details' : 'View Donor Details'}
+                                            {expandedDonorNotification === notification.id
+                                                ? 'Hide Donor Details' : 'View Donor Details'}
                                         </button>
-                                        
+
                                         {expandedDonorNotification === notification.id && (
-                                            <div className="details-card donor-details"> 
+                                            <div className="details-card donor-details">
                                                 <h4>Donor Information:</h4>
                                                 <p><strong>Name:</strong> {notification.donorDetails.FullName}</p>
                                                 <p><strong>Contact:</strong> {notification.donorDetails.PhoneNo}</p>
                                                 <p><strong>Blood Group:</strong> {notification.donorDetails.bloodgrp}</p>
                                                 <p><strong>Location:</strong> {notification.donorDetails.City}, {notification.donorDetails.District}</p>
-                                                <p><strong>Donation Fulfilled On:</strong> {
-                                                    new Date(
-                                                        notification.requestData.AcceptedByDoner
-                                                            .find(d => d.donationStatus === "Fulfilled")
-                                                            ?.AccepteddAt 
-                                                    ).toLocaleString()
-                                                }</p>
+                                                <p><strong>Donation Fulfilled On:</strong> {new Date(notification.donationInfo.AccepteddAt).toLocaleString()}</p>
                                             </div>
                                         )}
                                     </>
@@ -178,21 +182,21 @@ function UserNotification() {
 
                                 {notification.hasHospitalInfo && (
                                     <>
-                                        <button 
-                                            className="view-details-btn hospital-btn" 
+                                        <button
+                                            className="view-details-btn hospital-btn"
                                             onClick={() => toggleHospitalDetails(notification.id)}
                                         >
-                                            {expandedHospitalNotification === notification.id ? 
-                                                'Hide Hospital Details' : 'View Hospital Details'}
+                                            {expandedHospitalNotification === notification.id
+                                                ? 'Hide Hospital Details' : 'View Hospital Details'}
                                         </button>
-                                        
+
                                         {expandedHospitalNotification === notification.id && (
-                                            <div className="details-card hospital-details"> 
+                                            <div className="details-card hospital-details">
                                                 <h4>Hospital Information:</h4>
                                                 <p><strong>Name:</strong> {notification.hospitalDetails.FullName}</p>
                                                 <p><strong>Contact:</strong> {notification.hospitalDetails.PhoneNo}</p>
                                                 <p><strong>Email:</strong> {notification.hospitalDetails.Email}</p>
-                                                <p><strong>Address:</strong> {notification.hospitalDetails.Address}, {notification.hospitalDetails.Street}, {notification.hospitalDetails.City} - {notification.hospitalDetails.Pincode}</p>
+                                                <p><strong>Address:</strong> {`${notification.hospitalDetails.Address}, ${notification.hospitalDetails.Street}, ${notification.hospitalDetails.City} - ${notification.hospitalDetails.Pincode}`}</p>
                                                 <p><strong>Registration No:</strong> {notification.hospitalDetails.RegistrationNumber}</p>
                                                 {notification.requestData.HospitalApprovedAt && (
                                                     <p><strong>Approved On:</strong> {new Date(notification.requestData.HospitalApprovedAt).toLocaleString()}</p>
@@ -201,11 +205,11 @@ function UserNotification() {
                                         )}
                                     </>
                                 )}
-                                
+
                                 <div className="notification-actions">
-                                    <button 
+                                    <button
                                         className="action-button mark-read"
-                                        onClick={() => markAsRead(notification.id)}
+                                        onClick={() => markAsRead(notification.originalRequestId)}
                                     >
                                         <CheckIcon />
                                     </button>
@@ -213,8 +217,8 @@ function UserNotification() {
                             </div>
                         ))
                     ) : (
-                        <div style={{display:'flex',justifyContent:"center",alignItems:"center"}}>
-                        <h3 className="no-notifications">No pending notifications found</h3>
+                        <div style={{ display: 'flex', justifyContent: "center", alignItems: "center" }}>
+                            <h3 className="no-notifications">No pending notifications found</h3>
                         </div>
                     )}
                 </div>
