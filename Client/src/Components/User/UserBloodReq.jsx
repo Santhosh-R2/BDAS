@@ -15,8 +15,10 @@ import 'react-toastify/dist/ReactToastify.css';
 import axiosInstance from '../Service/BaseUrl';
 import UserNav from './UserNav';
 import UserSideMenu from './UserSideMenu';
+import { useNavigate } from 'react-router-dom';
 
 function UserBloodReq() {
+    const navigate = useNavigate()
     const bloodGroups = [
         "A Positive (A+)", "A Negative (A-)",
         "B Positive (B+)", "B Negative (B-)",
@@ -273,7 +275,7 @@ function UserBloodReq() {
                 if (formData.status === 'Very Urgent' || formData.status === 'Emergency') {
                     successMessage += ' Eligible donors have been notified via email.';
                 }
-                
+                navigate('/user-view-requests')
                 toast.success(successMessage);
                 setFormData({
                     patientName: '',

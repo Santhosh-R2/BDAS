@@ -76,7 +76,6 @@
     background-color: #f44336;
     color: white;
 }
-/* Base style for buttons */
 .view-details-btn {
     border: none;
     padding: 8px 12px;
@@ -87,20 +86,18 @@
     transition: background-color 0.3s ease;
 }
 
-/* Specific style for donor button */
 .view-details-btn.donor-btn {
-    background-color: #007bff; /* Blue */
+    background-color: #007bff;
     color: white;
-    margin-right: 10px; /* Space between buttons if both are present */
+    margin-right: 10px; 
 }
 
 .view-details-btn.donor-btn:hover {
     background-color: #0056b3;
 }
 
-/* Specific style for hospital button */
 .view-details-btn.hospital-btn {
-    background-color: #28a745; /* Green */
+    background-color: #28a745; 
     color: white;
 }
 
@@ -108,7 +105,6 @@
     background-color: #218838;
 }
 
-/* Base style for details cards */
 .details-card {
     margin-top: 15px;
     padding: 15px;
@@ -116,9 +112,8 @@
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-/* Specific style for donor details card */
 .details-card.donor-details {
-    background-color: #e0f7fa; /* Light blue */
+    background-color: #e0f7fa; 
     border-left: 5px solid #007bff;
 }
 
@@ -127,9 +122,8 @@
     color: #007bff;
 }
 
-/* Specific style for hospital details card */
 .details-card.hospital-details {
-    background-color: #e9f5e9; /* Light green */
+    background-color: #e9f5e9; 
     border-left: 5px solid #28a745;
 }
 

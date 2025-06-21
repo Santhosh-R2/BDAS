@@ -1,73 +1,71 @@
-/* General body/html styling (optional, but good for a consistent look) */
 
 .main-hos-reg-container {
     padding: 20px;
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* Align to top of the screen */
-    min-height: 100vh; /* Ensure container is at least viewport height */
+    align-items: flex-start;
+    min-height: 100vh;
 }
 
 .hospitalInfo-container {
     display: flex;
     flex-direction: column;
-    background-color: #ffffff; /* Solid white for better readability */
+    background-color: #ffffff; 
     padding: 30px;
-    border-radius: 12px; /* Slightly more rounded corners */
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12); /* Deeper, softer shadow */
-    max-width: 500px; /* Increased max-width for more breathing room */
-    width: 95%; /* Responsive width */
-    margin-top: 50px; /* Space from top */
-    margin-bottom: 50px; /* Space from bottom for long forms */
+    border-radius: 12px; 
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12); 
+    max-width: 500px; 
+    width: 95%; 
+    margin-top: 50px; 
+    margin-bottom: 50px; 
 }
 
 .hospitalInfo-container h2 {
-    color: #333; /* Darker text */
+    color: #333; 
     text-align: center;
-    margin-bottom: 25px; /* More space below title */
-    font-size: 1.8rem; /* Slightly larger title */
+    margin-bottom: 25px; 
+    font-size: 1.8rem; 
     font-weight: 600;
 }
 
 .hospitalInfo-title {
-    font-size: 1.1rem; /* Slightly smaller, more like a subtitle */
-    font-weight: 600; /* Stronger font weight */
+    font-size: 1.1rem; 
+    font-weight: 600; 
     margin-bottom: 15px;
-    color: #555; /* Softer color */
+    color: #555; 
     text-align: left;
     width: 100%;
-    border-bottom: 1px solid #eee; /* Subtle separator line */
+    border-bottom: 1px solid #eee; 
     padding-bottom: 10px;
-    margin-top: 20px; /* Space above each section title */
+    margin-top: 20px; 
 }
 
 .hospitalInfo-row {
     display: flex;
     flex-direction: row;
-    gap: 20px; /* Increased gap between items */
+    gap: 20px; 
     margin-bottom: 20px;
     width: 100%;
-    flex-wrap: wrap; /* Allow inputs to wrap onto the next line on smaller screens */
-    justify-content: space-between; /* Distribute items evenly */
+    flex-wrap: wrap;
+    justify-content: space-between; 
 }
 
-/* Target MUI TextField components directly for better styling */
 .hospitalInfo-row .MuiTextField-root {
-    flex: 1; /* Allows text fields to grow and shrink */
-    min-width: 180px; /* Minimum width before wrapping */
+    flex: 1; 
+    min-width: 180px; 
 }
 
 .hospitalInfo-pass {
     display: flex;
     flex-direction: column;
-    align-items: center; /* Center the password field */
-    margin-bottom: 25px; /* More space */
+    align-items: center; 
+    margin-bottom: 25px; 
     width: 100%;
 }
 
-.hospitalInfo-pass .MuiTextField-root { /* Target MUI TextField component inside .hospitalInfo-pass */
-    width: 100%; /* Take full width of its container */
-    max-width: 350px; /* Max width for the password field for better aesthetics */
+.hospitalInfo-pass .MuiTextField-root { 
+    width: 100%; 
+    max-width: 350px; 
 }
 
 .hospitalInfo-uploadContainer {
@@ -75,7 +73,7 @@
     flex-direction: column;
     align-items: flex-start;
     width: 100%;
-    margin-bottom: 30px; /* More space */
+    margin-bottom: 30px;
 }
 
 .hospitalInfo-fileInputDisplay {
@@ -86,18 +84,18 @@
 
 .hospitalInfo-uploadLabel {
     display: inline-block;
-    padding: 10px 25px; /* More padding */
-    background-color: #D32F2F; /* Consistent with button color (Red) */
+    padding: 10px 25px; 
+    background-color: #D32F2F; 
     color: white;
-    border-radius: 8px; /* Slightly more rounded */
+    border-radius: 8px; 
     cursor: pointer;
     font-size: 1rem;
     font-weight: 500;
-    transition: background-color 0.3s ease; /* Smooth hover effect */
+    transition: background-color 0.3s ease; 
 }
 
 .hospitalInfo-uploadLabel:hover {
-    background-color: #a72323; /* Darker red on hover */
+    background-color: #a72323; 
 }
 
 .hospitalInfo-buttonContainer {
@@ -107,20 +105,19 @@
 }
 
 .hospitalInfo-button {
-    padding: 12px 30px; /* More padding */
-    font-size: 1.05rem; /* Slightly larger font */
-    font-weight: 600; /* Bolder */
-    border-radius: 8px; /* Consistent border radius */
-    background-color: #D32F2F !important; /* Use !important if MUI default is hard to override */
-    color: white !important; /* Ensure text color is white */
+    padding: 12px 30px; 
+    font-size: 1.05rem; 
+    font-weight: 600; 
+    border-radius: 8px; 
+    background-color: #D32F2F !important; 
+    color: white !important; 
     transition: background-color 0.3s ease;
 }
 
 .hospitalInfo-button:hover {
-    background-color: #a72323 !important; /* Darker red on hover */
+    background-color: #a72323 !important; 
 }
 
-/* --- Media Queries for Responsiveness --- */
 @media (max-width: 600px) {
     .hospitalInfo-container {
         padding: 20px;
@@ -139,23 +136,23 @@
     }
 
     .hospitalInfo-row {
-        flex-direction: column; /* Stack inputs vertically on small screens */
-        gap: 15px; /* Slightly less gap */
+        flex-direction: column; 
+        gap: 15px; 
     }
 
     .hospitalInfo-row .MuiTextField-root {
-        min-width: unset; /* Remove min-width to allow full flexibility */
-        width: 100%; /* Ensure they take full width */
+        min-width: unset; 
+        width: 100%; 
     }
 
     .hospitalInfo-pass .MuiTextField-root {
-        max-width: 100%; /* Take full width on small screens */
+        max-width: 100%; 
     }
 
     .hospitalInfo-uploadLabel {
         padding: 10px 20px;
         font-size: 0.95rem;
-        width: 100%; /* Full width for upload label */
+        width: 100%; 
         text-align: center;
     }
 

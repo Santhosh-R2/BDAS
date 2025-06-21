@@ -67,7 +67,6 @@ const NavigationHandler = () => {
   const location = useLocation();
 
   React.useEffect(() => {
-    // Ensure browser navigation works
     const unblock = window.addEventListener('popstate', () => {
       navigate(location.pathname, { replace: true });
     });

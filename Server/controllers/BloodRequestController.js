@@ -623,7 +623,6 @@ exports.donercancelBloodRequest = async (req, res) => {
       });
     }
 
-    // Check if donor has already rejected this request
     const alreadyRejected = request.RejectedByDoner.some(
       rejection => rejection.donerId && rejection.donerId.toString() === donerId
     );
@@ -634,7 +633,6 @@ exports.donercancelBloodRequest = async (req, res) => {
       });
     }
 
-    // Check if donor exists in AcceptedByDoner
     const donorInAccepted = request.AcceptedByDoner.find(
       donor => donor.donerId && donor.donerId._id.toString() === donerId
     );
@@ -645,13 +643,11 @@ exports.donercancelBloodRequest = async (req, res) => {
       });
     }
 
-    // Create new rejection record
     const newRejection = {
       donerId: donerId,
       rejectedAt: new Date()
     };
 
-    // Update the request in one atomic operation
     const updatedRequest = await BloodRequest.findByIdAndUpdate(
       id,
       {
@@ -681,9 +677,6 @@ exports.donercancelBloodRequest = async (req, res) => {
   }
 };
 
-// Notification Controller
-
-// For Admin marking as read
 exports.markAsReadByAdmin = async (req, res) => {
   try {
       const { requestId } = req.params;
@@ -698,7 +691,6 @@ exports.markAsReadByAdmin = async (req, res) => {
   }
 };
 
-// For User marking as read
 exports.markAsReadByUser = async (req, res) => {
   try {
       const { requestId } = req.params;
@@ -713,7 +705,6 @@ exports.markAsReadByUser = async (req, res) => {
   }
 };
 
-// For Donor marking as read
 exports.markAsReadByDoner = async (req, res) => {
   try {
       const { requestId } = req.params;

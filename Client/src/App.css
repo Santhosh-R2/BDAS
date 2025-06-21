@@ -9,7 +9,7 @@ input[type="number"]::-webkit-inner-spin-button{
     background: transparent; 
   }
 
-/* * {
+* {
   -webkit-user-select: none; 
   -moz-user-select: none; 
   -ms-user-select: none; 
@@ -18,4 +18,4 @@ input[type="number"]::-webkit-inner-spin-button{
 
 img {
   pointer-events: none; 
-} */
+}

@@ -1,7 +1,7 @@
 .sidemenu-container {
     width: 280px;
     height: 100vh;
-    background-color: #ffffff;
+    background-color: #f36262;
     box-shadow: 2px 0 15px rgba(0, 0, 0, 0.05);
     display: flex;
     flex-direction: column;
@@ -15,16 +15,18 @@
     align-items: center;
     gap: 15px;
     padding: 25px 20px;
-    border-bottom: 1px solid #f0f0f0;
-    background-color: #ffffff;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    background-color: #f36262;
     margin-top: 70px;
     max-width: 100%; 
     overflow: hidden; 
+    color: white;
 }
+
 .Admin-card .MuiAvatar-root {
     width: 60px;
     height: 60px;
-    border: 2px solid #e0e0e0;
+    border: 2px solid #ffffff;
 }
 
 .Admin-card div {
@@ -33,15 +35,17 @@
     max-width: calc(100% - 75px); 
     overflow: hidden;
 }
+
 .Admin-card h3 {
     margin: 0;
     font-size: 18px;
     font-weight: 600;
-    color: #333333;
+    color: white;
     white-space: nowrap; 
     overflow: hidden; 
     text-overflow: ellipsis; 
 }
+
 .Admin-card h5 {
     margin: 5px 0 0 0;
     font-size: 17px;
@@ -49,7 +53,9 @@
     white-space: nowrap; 
     overflow: hidden; 
     text-overflow: ellipsis; 
+    color: white;
 }
+
 .sidemenu-options {
     padding: 15px 0;
     flex-grow: 1;
@@ -63,10 +69,11 @@
     padding: 14px 25px;
     font-size: 17.5px;
     font-weight: 500;
-    color: black;
+    color: white;
     cursor: pointer;
     position: relative;
     text-decoration: none;
+    transition: all 0.3s ease;
 }
 
 .menu-link {
@@ -79,12 +86,12 @@
 }
 
 .menu-item:hover, .menu-header:hover {
-    background-color: #D1DDFD;
+    background-color: rgba(0, 0, 0, 0.1);
 }
 
 .menu-item.active, .menu-header.active {
-    background-color: skyblue;
-    color: black;
+    background-color: black;
+    color: white;
     font-weight: 600;
 }
 
@@ -92,11 +99,11 @@
     position: absolute;
     right: 3px;
     font-size: 30px !important;
-    color: black;
+    color: white;
 }
 
 .submenu {
-    background-color: #f9f9f9;
+    background-color: rgba(0, 0, 0, 0.1);
     padding: 5px 0;
 }
 
@@ -105,19 +112,19 @@
     padding: 10px 25px 10px 50px;
     font-size: 15px;
     font-weight: 500;
-    color: #555;
+    color: white;
     cursor: pointer;
     transition: all 0.2s ease;
     text-decoration: none;
 }
 
 .submenu-item:hover {
-    background-color: #D1DDFD;
+    background-color: rgba(0, 0, 0, 0.2);
 }
 
 .submenu-item.active-sub {
-    background-color: skyblue;
-    color: black;
+    background-color: black;
+    color: white;
     font-weight: 600;
 }
 
@@ -125,4 +132,5 @@
     width: 24px;
     height: 24px;
     object-fit: contain;
+    filter: brightness(0) invert(1);
 }
